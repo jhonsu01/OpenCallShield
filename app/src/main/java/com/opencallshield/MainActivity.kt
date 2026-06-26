@@ -49,15 +49,9 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun requestRuntimePermissions() {
-        val perms = mutableListOf(
-            Manifest.permission.READ_CONTACTS,
-            Manifest.permission.READ_CALL_LOG,
-            Manifest.permission.READ_PHONE_STATE
-        )
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            perms.add(Manifest.permission.POST_NOTIFICATIONS)
-        }
-        permissionLauncher.launch(perms.toTypedArray())
+        // Solo se necesita READ_CONTACTS (para no bloquear a contactos conocidos).
+        // El filtrado de llamadas se concede aparte mediante ROLE_CALL_SCREENING.
+        permissionLauncher.launch(arrayOf(Manifest.permission.READ_CONTACTS))
     }
 
     /**
