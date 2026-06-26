@@ -97,6 +97,20 @@ Dos formas de iniciar sesión (sin servidor/backend):
 El token se guarda **cifrado** en el dispositivo (`EncryptedSharedPreferences`); nunca
 se sube a ningún sitio salvo a la propia API de GitHub.
 
+## 🛠️ Aprobar aportes (mantenedor)
+
+Los aportes llegan como **Issues** con un bloque JSON. Para integrarlos a la base con
+**un clic**, el repo incluye la Action [`integrate-spam.yml`](.github/workflows/integrate-spam.yml):
+
+1. Crea una etiqueta llamada **`aprobado`** en el repo (una sola vez):
+   *Issues → Labels → New label → `aprobado`*.
+2. Revisa el Issue de aporte y, si los números son correctos, **aplícale la etiqueta `aprobado`**.
+3. La Action lee el JSON, lo **fusiona en `spam_numbers.json`** (sin duplicados, sumando
+   reportes), hace commit en `main` y **cierra el Issue** con un comentario de confirmación.
+
+Si prefieres hacerlo a mano: copia el bloque JSON del Issue, pégalo dentro de `"numbers"`
+en `spam_numbers.json`, actualiza `"updated_at"` y haz commit con `Closes #N`.
+
 ## 🔓 Licencia
 
 MIT — ver [LICENSE](LICENSE).

@@ -1,0 +1,71 @@
+name: Integrar aporte SPAM
+
+# Se dispara al anadir una etiqueta a un Issue. Solo actua si la etiqueta es "aprobado".
+on:
+  issues:
+    types: [labeled]
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  integrate:
+    if: github.event.label.name == 'aprobado'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (main)
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Integrar numeros del Issue
+        env:
+          ISSUE_BODY: ${{ github.event.issue.body }}
+        run: python .github/scripts/integrate_spam.py
+
+      - name: Commit y push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if [ -n "$(git status --porcelain spam_numbers.json)" ]; then
+            git add spam_numbers.json
+            git commit -m "data: integra aporte del Issue #${{ github.event.issue.number }} [skip ci]"
+            git push
+          else
+            echo "Sin cambios: los numeros ya estaban en la base."
+          fi
+
+      - name: Comentar y cerrar el Issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: '✅ Aporte integrado en `spam_numbers.json`. ¡Gracias por colaborar!'
+            });
+            await github.rest.issues.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              state: 'closed'
+            });
+
+      - name: Avisar si fallo
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: '⚠️ No se pudo integrar automaticamente. Revisa que el Issue contenga un bloque ```json``` valido, o integralo a mano.'
+            });
