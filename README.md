@@ -62,8 +62,40 @@ Formato:
 }
 ```
 
-Para ampliar la base, edita `spam_numbers.json` (o acepta Pull Requests de la comunidad).
+Para ampliar la base, edita `spam_numbers.json` (o acepta aportes de la comunidad).
 La URL es configurable desde la propia app.
+
+## 🔑 Aportar desde la app (login con GitHub)
+
+Desde la pestaña **Cuenta** el usuario puede iniciar sesión con GitHub y, desde
+**Lista SPAM**, pulsar **"Aportar a la base pública"**: la app abre un **Issue** en el
+repo con los números reportados en formato JSON, listos para integrar en `spam_numbers.json`.
+Cualquiera que clone o haga fork puede aportar a su propio repo cambiando el destino.
+
+Dos formas de iniciar sesión (sin servidor/backend):
+
+### Opción A — OAuth Device Flow (recomendado)
+
+1. En GitHub: **Settings → Developer settings → OAuth Apps → New OAuth App**.
+   - *Application name:* OpenCallShield
+   - *Homepage URL:* `https://github.com/jhonsu01/OpenCallShield`
+   - *Authorization callback URL:* `https://github.com/jhonsu01/OpenCallShield` (no se usa en Device Flow)
+2. Tras crearla, en la página de la app marca **Enable Device Flow** y guarda.
+3. Copia el **Client ID** (es público, no es secreto).
+4. En la app → pestaña **Cuenta** → pega el Client ID y pulsa **Iniciar sesión con GitHub**.
+   Sigue el código en `github.com/login/device`.
+
+> El Client ID puede fijarse por defecto en `SettingsStore.DEFAULT_CLIENT_ID`
+> (`app/src/main/java/com/opencallshield/data/SettingsStore.kt`) para que venga precargado.
+
+### Opción B — Token personal (PAT)
+
+1. GitHub → **Settings → Developer settings → Personal access tokens** → crea uno con
+   scope **`public_repo`**.
+2. En la app → pestaña **Cuenta** → pégalo en *"Entrar con token"*.
+
+El token se guarda **cifrado** en el dispositivo (`EncryptedSharedPreferences`); nunca
+se sube a ningún sitio salvo a la propia API de GitHub.
 
 ## 🔓 Licencia
 

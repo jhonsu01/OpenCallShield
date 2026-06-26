@@ -11,8 +11,15 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Login
+import androidx.compose.material.icons.automirrored.filled.Logout
+import androidx.compose.material.icons.automirrored.filled.OpenInNew
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Block
+import androidx.compose.material.icons.filled.CloudUpload
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Shield
@@ -20,19 +27,19 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -44,6 +51,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -59,10 +67,11 @@ fun MainScreen(
     viewModel: MainViewModel,
     onRequestRole: () -> Unit
 ) {
-    val tabs = listOf("Proteccion", "Lista SPAM", "Historial")
+    val tabs = listOf("Proteccion", "Lista SPAM", "Historial", "Cuenta")
     var selectedTab by remember { mutableIntStateOf(0) }
 
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val authState by viewModel.authState.collectAsStateWithLifecycle()
     val spamNumbers by viewModel.spamNumbers.collectAsStateWithLifecycle()
     val blockedCalls by viewModel.blockedCalls.collectAsStateWithLifecycle()
 
@@ -72,6 +81,12 @@ fun MainScreen(
         state.message?.let {
             snackbarHost.showSnackbar(it)
             viewModel.consumeMessage()
+        }
+    }
+    LaunchedEffect(authState.message) {
+        authState.message?.let {
+            snackbarHost.showSnackbar(it)
+            viewModel.consumeAuthMessage()
         }
     }
 
@@ -90,7 +105,7 @@ fun MainScreen(
         }
     ) { padding ->
         Column(Modifier.padding(padding).fillMaxSize()) {
-            TabRow(selectedTabIndex = selectedTab) {
+            ScrollableTabRow(selectedTabIndex = selectedTab, edgePadding = 0.dp) {
                 tabs.forEachIndexed { index, title ->
                     Tab(
                         selected = selectedTab == index,
@@ -101,8 +116,9 @@ fun MainScreen(
             }
             when (selectedTab) {
                 0 -> ProtectionTab(state, viewModel, onRequestRole, spamNumbers.size, blockedCalls.size)
-                1 -> SpamListTab(spamNumbers, viewModel)
-                else -> HistoryTab(blockedCalls, viewModel)
+                1 -> SpamListTab(spamNumbers, authState, viewModel)
+                2 -> HistoryTab(blockedCalls, viewModel)
+                else -> AccountTab(authState, viewModel)
             }
         }
     }
@@ -119,6 +135,7 @@ private fun ProtectionTab(
     Column(
         Modifier
             .fillMaxSize()
+            .verticalScroll(rememberScrollState())
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
@@ -149,7 +166,7 @@ private fun ProtectionTab(
             style = MaterialTheme.typography.bodySmall
         )
 
-        Divider()
+        HorizontalDivider()
 
         SettingRow(
             title = "Bloquear numeros desconocidos",
@@ -178,7 +195,7 @@ private fun ProtectionTab(
             singleLine = true
         )
 
-        Divider()
+        HorizontalDivider()
 
         OutlinedTextField(
             value = state.syncUrl,
@@ -225,9 +242,11 @@ private fun SettingRow(
 @Composable
 private fun SpamListTab(
     numbers: List<SpamNumber>,
+    authState: AuthUiState,
     viewModel: MainViewModel
 ) {
     var input by remember { mutableStateOf("") }
+    val localCount = numbers.count { it.source == "local" }
 
     Column(Modifier.fillMaxSize().padding(16.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -246,6 +265,21 @@ private fun SpamListTab(
                 Icon(Icons.Filled.Block, contentDescription = "Reportar")
             }
         }
+
+        Spacer(Modifier.size(8.dp))
+        Button(
+            onClick = { viewModel.contribute() },
+            modifier = Modifier.fillMaxWidth(),
+            enabled = authState.loggedIn && localCount > 0 && !authState.busy
+        ) {
+            Icon(Icons.Filled.CloudUpload, contentDescription = null)
+            Spacer(Modifier.width(8.dp))
+            Text(
+                if (authState.loggedIn) "Aportar $localCount numero(s) a la base publica"
+                else "Inicia sesion (pestana Cuenta) para aportar"
+            )
+        }
+
         Spacer(Modifier.size(12.dp))
         if (numbers.isEmpty()) {
             EmptyState("Aun no hay numeros reportados.")
@@ -322,6 +356,150 @@ private fun HistoryTab(
                         }
                     }
                 }
+            }
+        }
+    }
+}
+
+@Composable
+private fun AccountTab(
+    authState: AuthUiState,
+    viewModel: MainViewModel
+) {
+    val uriHandler = LocalUriHandler.current
+
+    Column(
+        Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        if (authState.loggedIn) {
+            Card(Modifier.fillMaxWidth()) {
+                Column(Modifier.padding(16.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Filled.AccountCircle, contentDescription = null)
+                        Spacer(Modifier.width(8.dp))
+                        Text("Conectado como @${authState.login}", style = MaterialTheme.typography.titleMedium)
+                    }
+                    Spacer(Modifier.size(4.dp))
+                    Text(
+                        "Metodo: ${authState.method ?: "-"}. Tus aportes se envian como Issue al repositorio publico.",
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
+            }
+            OutlinedButton(onClick = { viewModel.logout() }, modifier = Modifier.fillMaxWidth()) {
+                Icon(Icons.AutoMirrored.Filled.Logout, contentDescription = null)
+                Spacer(Modifier.width(8.dp))
+                Text("Cerrar sesion")
+            }
+            return@Column
+        }
+
+        // Estado del Device Flow en curso
+        val device = authState.deviceCode
+        if (device != null) {
+            Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)) {
+                Column(Modifier.padding(16.dp)) {
+                    Text("Paso 1 - Escribe este codigo en GitHub:", style = MaterialTheme.typography.bodyMedium)
+                    Spacer(Modifier.size(8.dp))
+                    Text(
+                        device.userCode,
+                        style = MaterialTheme.typography.headlineMedium,
+                        color = MaterialTheme.colorScheme.onSecondaryContainer
+                    )
+                    Spacer(Modifier.size(12.dp))
+                    Button(
+                        onClick = { uriHandler.openUri(device.verificationUri) },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Icon(Icons.AutoMirrored.Filled.OpenInNew, contentDescription = null)
+                        Spacer(Modifier.width(8.dp))
+                        Text("Abrir ${device.verificationUri}")
+                    }
+                    Spacer(Modifier.size(12.dp))
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp)
+                        Spacer(Modifier.width(8.dp))
+                        Text("Esperando autorizacion...", style = MaterialTheme.typography.bodySmall)
+                    }
+                    Spacer(Modifier.size(8.dp))
+                    OutlinedButton(
+                        onClick = { viewModel.cancelDeviceLogin() },
+                        modifier = Modifier.fillMaxWidth()
+                    ) { Text("Cancelar") }
+                }
+            }
+            return@Column
+        }
+
+        Text(
+            "Inicia sesion con GitHub para aportar tu lista de SPAM a la base publica.",
+            style = MaterialTheme.typography.bodyMedium
+        )
+
+        // --- Device Flow ---
+        Card(Modifier.fillMaxWidth()) {
+            Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text("Opcion A - GitHub (recomendado)", style = MaterialTheme.typography.titleSmall)
+                OutlinedTextField(
+                    value = authState.clientId,
+                    onValueChange = viewModel::setClientId,
+                    label = { Text("Client ID de la OAuth App") },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true
+                )
+                Button(
+                    onClick = { viewModel.startDeviceLogin() },
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = !authState.busy
+                ) {
+                    Icon(Icons.AutoMirrored.Filled.Login, contentDescription = null)
+                    Spacer(Modifier.width(8.dp))
+                    Text("Iniciar sesion con GitHub")
+                }
+                Text(
+                    "Necesita una OAuth App con Device Flow activado. El Client ID es publico.",
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
+        }
+
+        HorizontalDivider()
+
+        // --- PAT ---
+        var pat by remember { mutableStateOf("") }
+        Card(Modifier.fillMaxWidth()) {
+            Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text("Opcion B - Token personal (PAT)", style = MaterialTheme.typography.titleSmall)
+                OutlinedTextField(
+                    value = pat,
+                    onValueChange = { pat = it },
+                    label = { Text("Token (scope public_repo)") },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true
+                )
+                OutlinedButton(
+                    onClick = { viewModel.loginWithPat(pat) },
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = !authState.busy
+                ) {
+                    Text("Entrar con token")
+                }
+                Text(
+                    "Crea el token en github.com/settings/tokens con permiso public_repo.",
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
+        }
+
+        if (authState.busy) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp)
+                Spacer(Modifier.width(8.dp))
+                Text("Procesando...", style = MaterialTheme.typography.bodySmall)
             }
         }
     }
