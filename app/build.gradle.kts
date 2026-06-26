@@ -26,8 +26,8 @@ android {
         applicationId = "io.github.jhonsu01.opencallshield"
         minSdk = 29
         targetSdk = 34
-        versionCode = 5
-        versionName = "1.2.1"
+        versionCode = 6
+        versionName = "1.3.0"
         vectorDrawables { useSupportLibrary = true }
     }
 

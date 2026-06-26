@@ -25,7 +25,9 @@ import androidx.compose.material.icons.filled.CloudUpload
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Shield
+import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -43,6 +45,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -53,6 +56,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -63,6 +67,9 @@ import com.opencallshield.data.SpamRepository
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+
+private const val REPO_URL = "https://github.com/jhonsu01/OpenCallShield"
+private const val KOFI_URL = "https://ko-fi.com/V7V81LV7GX"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -119,7 +126,7 @@ fun MainScreen(
             }
             when (selectedTab) {
                 0 -> ProtectionTab(state, viewModel, onRequestRole, spamNumbers.size, blockedCalls.size)
-                1 -> SpamListTab(spamNumbers, authState, viewModel)
+                1 -> SpamListTab(spamNumbers, authState, state.syncing, viewModel)
                 2 -> HistoryTab(blockedCalls, spamNumbers, viewModel)
                 else -> AccountTab(authState, viewModel)
             }
@@ -135,6 +142,7 @@ private fun ProtectionTab(
     spamCount: Int,
     blockedCount: Int
 ) {
+    val uriHandler = LocalUriHandler.current
     Column(
         Modifier
             .fillMaxSize()
@@ -220,6 +228,29 @@ private fun ProtectionTab(
                 Text("Sincronizar ahora")
             }
         }
+
+        HorizontalDivider()
+
+        // Donaciones (Ko-fi)
+        Button(
+            onClick = { uriHandler.openUri(KOFI_URL) },
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF29ABE0))
+        ) {
+            Text("☕  Apoyame en Ko-fi")
+        }
+        Text(
+            "OpenCallShield es gratuito y open source. Si te resulta util, considera apoyarlo.",
+            style = MaterialTheme.typography.bodySmall
+        )
+
+        // Pie: enlace al repositorio
+        TextButton(
+            onClick = { uriHandler.openUri(REPO_URL) },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("OpenCallShield  -  ver el proyecto en GitHub")
+        }
     }
 }
 
@@ -246,6 +277,7 @@ private fun SettingRow(
 private fun SpamListTab(
     numbers: List<SpamNumber>,
     authState: AuthUiState,
+    syncing: Boolean,
     viewModel: MainViewModel
 ) {
     var input by remember { mutableStateOf("") }
@@ -282,6 +314,28 @@ private fun SpamListTab(
                 else "Inicia sesion (pestana Cuenta) para aportar"
             )
         }
+
+        Spacer(Modifier.size(8.dp))
+        OutlinedButton(
+            onClick = { viewModel.syncNow() },
+            modifier = Modifier.fillMaxWidth(),
+            enabled = !syncing
+        ) {
+            if (syncing) {
+                CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp)
+                Spacer(Modifier.width(8.dp))
+                Text("Sincronizando...")
+            } else {
+                Icon(Icons.Filled.Sync, contentDescription = null)
+                Spacer(Modifier.width(8.dp))
+                Text("Sincronizar base publica")
+            }
+        }
+        Text(
+            "Sincroniza primero la base publica: los numeros que ya esten en ella no se " +
+                "vuelven a reportar. Asi solo aportas numeros nuevos y evitas duplicados.",
+            style = MaterialTheme.typography.bodySmall
+        )
 
         Spacer(Modifier.size(12.dp))
         if (numbers.isEmpty()) {

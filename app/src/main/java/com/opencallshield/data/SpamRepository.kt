@@ -34,10 +34,24 @@ class SpamRepository(
 
     suspend fun remove(number: String) = dao.deleteByNumber(normalize(number))
 
-    /** Mezcla la lista remota con la base local sin sobrescribir reportes locales. */
+    /**
+     * Mezcla la base publica con la local. Si un numero que el usuario ya tenia
+     * reportado (source "local") tambien aparece en la base publica, se marca como
+     * "github" para NO volver a aportarlo: asi solo se reportan numeros nuevos y se
+     * evitan Issues con duplicados.
+     */
     suspend fun mergeRemote(remote: List<SpamNumber>) {
         if (remote.isEmpty()) return
-        dao.insertAll(remote.map { it.copy(number = normalize(it.number)) })
+        for (item in remote) {
+            val n = normalize(item.number)
+            if (n.isEmpty()) continue
+            val existing = dao.findByNumber(n)
+            if (existing == null) {
+                dao.upsert(item.copy(number = n, source = "github"))
+            } else if (existing.source != "github") {
+                dao.upsert(existing.copy(source = "github"))
+            }
+        }
     }
 
     suspend fun logBlocked(number: String, reason: String, silenced: Boolean) {
