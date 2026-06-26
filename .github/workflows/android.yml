@@ -35,6 +35,11 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
+      # Sube el heap de Gradle SOLO en CI (evita "GC garbage collector is thrashing"
+      # al compilar Compose + KSP). No se toca el gradle.properties del repo.
+      - name: Configure Gradle heap (CI)
+        run: echo "org.gradle.jvmargs=-Xmx4g -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8" >> gradle.properties
+
       - name: Build debug APK
         run: ./gradlew assembleDebug --no-daemon --stacktrace
 
