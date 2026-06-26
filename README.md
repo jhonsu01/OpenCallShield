@@ -1,5 +1,8 @@
 # 🛡️ OpenCallShield
 
+[![Android CI](https://github.com/jhonsu01/OpenCallShield/actions/workflows/android.yml/badge.svg)](https://github.com/jhonsu01/OpenCallShield/actions/workflows/android.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+
 App Android open source (MIT) para **bloquear llamadas SPAM** mediante
 `CallScreeningService` (Android 10+), con base de datos local Room, motor de
 reglas de detección y sincronización con una base colaborativa pública en GitHub.
@@ -18,7 +21,7 @@ Alternativa privacidad-first y descentralizada a Truecaller.
 
 ## 🏗️ Stack
 
-Kotlin · Jetpack Compose · Room · WorkManager · MVVM · `CallScreeningService`
+Kotlin · Jetpack Compose (Material 3) · Room · WorkManager · MVVM · `CallScreeningService`
 
 ## 📦 Compilar
 
@@ -28,7 +31,9 @@ Kotlin · Jetpack Compose · Room · WorkManager · MVVM · `CallScreeningServic
 ./gradlew assembleRelease    # APK de release (requiere firma)
 ```
 
-El APK queda en `app/build/outputs/apk/`.
+El APK queda en `app/build/outputs/apk/`. La CI (GitHub Actions) también lo compila
+en cada push y lo adjunta como artefacto; al crear un tag `vX.Y.Z` publica un Release
+con el APK.
 
 ## 📲 Uso
 
@@ -37,7 +42,15 @@ El APK queda en `app/build/outputs/apk/`.
 3. Pulsa **"Activar como app de filtrado de llamadas"** y acepta el rol en Android.
 4. Ajusta las reglas y/o sincroniza la base colaborativa.
 
-## 🌐 Formato de la base colaborativa
+## 🌐 Base colaborativa
+
+La app sincroniza desde [`spam_numbers.json`](spam_numbers.json) de este mismo repo:
+
+```
+https://raw.githubusercontent.com/jhonsu01/OpenCallShield/main/spam_numbers.json
+```
+
+Formato:
 
 ```json
 {
@@ -48,6 +61,9 @@ El APK queda en `app/build/outputs/apk/`.
   ]
 }
 ```
+
+Para ampliar la base, edita `spam_numbers.json` (o acepta Pull Requests de la comunidad).
+La URL es configurable desde la propia app.
 
 ## 🔓 Licencia
 

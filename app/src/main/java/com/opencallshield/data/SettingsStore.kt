@@ -49,6 +49,6 @@ class SettingsStore(context: Context) {
         // Prefijos de ejemplo frecuentemente asociados a fraudes internacionales.
         const val DEFAULT_PREFIXES = "+234,+91,+62,+1900,+225"
         const val DEFAULT_SYNC_URL =
-            "https://raw.githubusercontent.com/opencallshield/spam-db/main/spam_numbers.json"
+            "https://raw.githubusercontent.com/jhonsu01/OpenCallShield/main/spam_numbers.json"
     }
 }

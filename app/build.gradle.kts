@@ -9,7 +9,7 @@ android {
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.opencallshield"
+        applicationId = "io.github.jhonsu01.opencallshield"
         minSdk = 29
         targetSdk = 34
         versionCode = 1

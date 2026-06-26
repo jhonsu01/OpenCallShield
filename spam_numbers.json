@@ -1,0 +1,8 @@
+{
+  "version": "1.0",
+  "updated_at": "2026-06-26",
+  "numbers": [
+    { "number": "+12025550143", "reports": 2, "tag": "example" },
+    { "number": "+12025550178", "reports": 1, "tag": "example" }
+  ]
+}
