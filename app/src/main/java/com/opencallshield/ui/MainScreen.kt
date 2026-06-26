@@ -18,7 +18,9 @@ import androidx.compose.material.icons.automirrored.filled.Login
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Block
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.CloudUpload
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.History
@@ -57,6 +59,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.opencallshield.data.BlockedCall
 import com.opencallshield.data.SpamNumber
+import com.opencallshield.data.SpamRepository
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -117,7 +120,7 @@ fun MainScreen(
             when (selectedTab) {
                 0 -> ProtectionTab(state, viewModel, onRequestRole, spamNumbers.size, blockedCalls.size)
                 1 -> SpamListTab(spamNumbers, authState, viewModel)
-                2 -> HistoryTab(blockedCalls, viewModel)
+                2 -> HistoryTab(blockedCalls, spamNumbers, viewModel)
                 else -> AccountTab(authState, viewModel)
             }
         }
@@ -312,9 +315,11 @@ private fun SpamListTab(
 @Composable
 private fun HistoryTab(
     calls: List<BlockedCall>,
+    spamNumbers: List<SpamNumber>,
     viewModel: MainViewModel
 ) {
     val formatter = remember { SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()) }
+    val spamSet = remember(spamNumbers) { spamNumbers.map { it.number }.toHashSet() }
 
     Column(Modifier.fillMaxSize().padding(16.dp)) {
         Row(
@@ -331,28 +336,55 @@ private fun HistoryTab(
                 }
             }
         }
+        Text(
+            "Toca + para anadir el numero a la lista de SPAM, o el check para quitarlo.",
+            style = MaterialTheme.typography.bodySmall
+        )
         Spacer(Modifier.size(12.dp))
         if (calls.isEmpty()) {
             EmptyState("Todavia no se ha filtrado ninguna llamada.")
         } else {
             LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 items(calls, key = { it.id }) { call ->
+                    val normalized = SpamRepository.normalize(call.number)
+                    val inList = normalized in spamSet
                     Card(Modifier.fillMaxWidth()) {
-                        Column(Modifier.padding(12.dp)) {
-                            Text(
-                                call.number,
-                                style = MaterialTheme.typography.bodyLarge,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
-                            Text(
-                                "${if (call.silenced) "Silenciada" else "Rechazada"} - ${call.reason}",
-                                style = MaterialTheme.typography.bodySmall
-                            )
-                            Text(
-                                formatter.format(Date(call.timestamp)),
-                                style = MaterialTheme.typography.bodySmall
-                            )
+                        Row(
+                            Modifier.padding(12.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column(Modifier.weight(1f)) {
+                                Text(
+                                    call.number,
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                                Text(
+                                    "${if (call.silenced) "Silenciada" else "Rechazada"} - ${call.reason}",
+                                    style = MaterialTheme.typography.bodySmall
+                                )
+                                Text(
+                                    formatter.format(Date(call.timestamp)),
+                                    style = MaterialTheme.typography.bodySmall
+                                )
+                            }
+                            if (inList) {
+                                IconButton(onClick = { viewModel.removeNumber(call.number) }) {
+                                    Icon(
+                                        Icons.Filled.CheckCircle,
+                                        contentDescription = "Quitar de SPAM",
+                                        tint = MaterialTheme.colorScheme.primary
+                                    )
+                                }
+                            } else {
+                                IconButton(onClick = { viewModel.addToSpam(call.number) }) {
+                                    Icon(
+                                        Icons.Filled.AddCircle,
+                                        contentDescription = "Anadir a SPAM"
+                                    )
+                                }
+                            }
                         }
                     }
                 }

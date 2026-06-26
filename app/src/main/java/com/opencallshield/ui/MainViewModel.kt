@@ -91,6 +91,12 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
 
     fun remove(item: SpamNumber) = viewModelScope.launch { repo.remove(item.number) }
 
+    /** Anade un numero (desde el historial) a la lista de SPAM. */
+    fun addToSpam(number: String) = viewModelScope.launch { repo.report(number) }
+
+    /** Quita un numero de la lista de SPAM por su valor. */
+    fun removeNumber(number: String) = viewModelScope.launch { repo.remove(number) }
+
     fun clearHistory() = viewModelScope.launch { repo.clearHistory() }
 
     fun setBlockUnknown(value: Boolean) {

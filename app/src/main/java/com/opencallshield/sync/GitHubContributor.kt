@@ -40,10 +40,12 @@ object GitHubContributor {
             append("\n```\n")
         }
 
+        // Sin labels: asignar/crear etiquetas requiere permiso de escritura sobre el
+        // repo. Un usuario externo (no colaborador) puede abrir un Issue, pero no
+        // etiquetarlo; incluir labels provocaba un 403. El titulo ya identifica el aporte.
         val payload = JSONObject()
             .put("title", "Aporte a base SPAM: ${numbers.size} numero(s)")
             .put("body", body)
-            .put("labels", JSONArray().put("spam-db"))
 
         val res = Http.request(
             method = "POST",
