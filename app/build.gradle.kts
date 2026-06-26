@@ -23,11 +23,11 @@ android {
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "io.github.jhonsu01.opencallshield"
+        applicationId = "com.jhonsu01.opencallshield"
         minSdk = 29
         targetSdk = 34
-        versionCode = 6
-        versionName = "1.3.0"
+        versionCode = 7
+        versionName = "1.3.1"
         vectorDrawables { useSupportLibrary = true }
     }
 
