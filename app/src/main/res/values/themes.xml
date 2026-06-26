@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Tema base de arranque. La UI real se dibuja con Jetpack Compose. -->
+    <style name="Theme.OpenCallShield" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:statusBarColor">@color/blue_dark</item>
+        <item name="android:windowBackground">@color/white</item>
+    </style>
+</resources>

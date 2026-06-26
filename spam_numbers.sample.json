@@ -1,0 +1,9 @@
+{
+  "version": "1.0",
+  "updated_at": "2026-06-26",
+  "numbers": [
+    { "number": "+18005551234", "reports": 342, "tag": "scam" },
+    { "number": "+442079460000", "reports": 87, "tag": "telemarketing" },
+    { "number": "+5491150000000", "reports": 51, "tag": "robocall" }
+  ]
+}
