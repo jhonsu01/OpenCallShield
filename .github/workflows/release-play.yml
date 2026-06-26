@@ -37,6 +37,9 @@ jobs:
           echo "code=$CODE" >> "$GITHUB_OUTPUT"
           echo "Tag $TAG -> versionName=$TAG versionCode=$CODE"
 
+      - name: Permiso de ejecucion a gradlew
+        run: chmod +x gradlew
+
       - name: Decodificar keystore
         run: |
           mkdir -p keystore
