@@ -26,8 +26,9 @@ android {
         applicationId = "com.jhonsu01.opencallshield"
         minSdk = 29
         targetSdk = 35
-        versionCode = 8
-        versionName = "1.3.2"
+        // En CI se derivan del tag (vX.Y.Z); en local usan estos valores por defecto.
+        versionCode = (project.findProperty("versionCodeOverride") as String?)?.toInt() ?: 8
+        versionName = (project.findProperty("versionNameOverride") as String?) ?: "1.3.2"
         vectorDrawables { useSupportLibrary = true }
     }
 

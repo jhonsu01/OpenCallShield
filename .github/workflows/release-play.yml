@@ -1,0 +1,64 @@
+name: Publicar en Google Play
+
+# Cada tag vX.Y.Z compila el AAB firmado y lo sube a Google Play (track interno).
+on:
+  push:
+    tags: [ 'v*' ]
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Configure Gradle heap (CI)
+        run: echo "org.gradle.jvmargs=-Xmx4g -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8" >> gradle.properties
+
+      - name: Derivar version del tag
+        id: ver
+        run: |
+          TAG="${GITHUB_REF_NAME#v}"
+          IFS='.' read -r MA MI PA <<< "$TAG"
+          CODE=$(( ${MA:-0} * 10000 + ${MI:-0} * 100 + ${PA:-0} ))
+          echo "name=$TAG" >> "$GITHUB_OUTPUT"
+          echo "code=$CODE" >> "$GITHUB_OUTPUT"
+          echo "Tag $TAG -> versionName=$TAG versionCode=$CODE"
+
+      - name: Decodificar keystore
+        run: |
+          mkdir -p keystore
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > keystore/release.jks
+
+      - name: Compilar AAB firmado
+        env:
+          KEYSTORE_FILE: keystore/release.jks
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: >
+          ./gradlew bundleRelease --no-daemon --stacktrace
+          -PversionNameOverride=${{ steps.ver.outputs.name }}
+          -PversionCodeOverride=${{ steps.ver.outputs.code }}
+
+      - name: Subir a Google Play (track interno)
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
+          packageName: com.jhonsu01.opencallshield
+          releaseFiles: app/build/outputs/bundle/release/app-release.aab
+          track: internal
+          status: completed
+          releaseName: ${{ steps.ver.outputs.name }}
