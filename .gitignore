@@ -9,3 +9,10 @@
 .cxx
 local.properties
 /app/build/
+
+# --- Firma de release: NUNCA commitear secretos ---
+keystore.properties
+*.jks
+*.keystore
+/keystore/
+KEYSTORE_BASE64.txt
