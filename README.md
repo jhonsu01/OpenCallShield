@@ -9,6 +9,15 @@ reglas de detección y sincronización con una base colaborativa pública en Git
 
 Alternativa privacidad-first y descentralizada a Truecaller.
 
+## ⬇️ Descargar
+
+<a href="https://play.google.com/store/apps/details?id=com.jhonsu01.opencallshield"><img alt="Disponible en Google Play" src="https://play.google.com/intl/en_us/badges/static/images/badges/es_badge_web_generic.png" height="60"/></a>
+
+- **Google Play:** https://play.google.com/store/apps/details?id=com.jhonsu01.opencallshield
+- **APK directo:** descarga el `.apk` desde la sección [**Releases**](https://github.com/jhonsu01/OpenCallShield/releases) (cada versión publica el APK e instalable sin la tienda).
+
+> Si el enlace de Play aún no abre, la app está **en revisión**; estará disponible en cuanto Google la apruebe.
+
 ## ✨ Funciones
 
 - **Bloqueo automático** de llamadas vía `CallScreeningService` (rechazar o silenciar).
