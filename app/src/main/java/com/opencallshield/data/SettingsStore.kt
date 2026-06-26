@@ -69,9 +69,9 @@ class SettingsStore(context: Context) {
         const val DEFAULT_SYNC_URL =
             "https://raw.githubusercontent.com/jhonsu01/OpenCallShield/main/spam_numbers.json"
 
-        // Client ID de la OAuth App (publico). Rellenar tras crear la OAuth App en GitHub.
-        // Tambien se puede configurar desde la pantalla Cuenta de la app.
-        const val DEFAULT_CLIENT_ID = ""
+        // Client ID de la OAuth App (publico). Tambien se puede sobrescribir desde
+        // la pantalla Cuenta de la app.
+        const val DEFAULT_CLIENT_ID = "Ov23lidavW0FWY6jProP"
         const val DEFAULT_CONTRIB_OWNER = "jhonsu01"
         const val DEFAULT_CONTRIB_REPO = "OpenCallShield"
     }
