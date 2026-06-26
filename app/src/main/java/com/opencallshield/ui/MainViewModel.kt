@@ -153,7 +153,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
             val device = withContext(Dispatchers.IO) {
                 runCatching { auth.startDeviceFlow(clientId) }
             }.getOrElse { e ->
-                _auth.update { it.copy(busy = false, message = "Error: ${e.message}") }
+                _auth.update { it.copy(busy = false, message = friendlyError(e)) }
                 return@launch
             }
             _auth.update { it.copy(deviceCode = device, busy = true) }
@@ -166,24 +166,35 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         val deadline = System.currentTimeMillis() + device.expiresIn * 1000L
         while (viewModelScope.isActive && System.currentTimeMillis() < deadline) {
             delay(interval * 1000L)
-            val result = withContext(Dispatchers.IO) {
+            // Un fallo de red transitorio NO debe abortar el flujo: seguimos
+            // reintentando hasta que el usuario autorice o el codigo expire.
+            val outcome = withContext(Dispatchers.IO) {
                 runCatching { auth.pollForToken(clientId, device.deviceCode) }
-                    .getOrElse { GitHubAuthManager.PollResult.Error(it.message ?: "Error de red") }
             }
+            val result = outcome.getOrNull() ?: continue
             when (result) {
                 is GitHubAuthManager.PollResult.Success -> {
                     finishLogin(result.token, "device")
                     return
                 }
-                is GitHubAuthManager.PollResult.Pending -> { /* seguir */ }
+                is GitHubAuthManager.PollResult.Pending -> { /* seguir esperando */ }
                 is GitHubAuthManager.PollResult.SlowDown -> interval = result.interval
                 is GitHubAuthManager.PollResult.Error -> {
+                    // Error del protocolo OAuth (codigo expirado o acceso denegado): abortar.
                     _auth.update { it.copy(busy = false, deviceCode = null, message = result.message) }
                     return
                 }
             }
         }
         _auth.update { it.copy(busy = false, deviceCode = null, message = "El codigo expiro, intenta de nuevo.") }
+    }
+
+    private fun friendlyError(e: Throwable): String = when (e) {
+        is java.net.UnknownHostException ->
+            "Sin conexion o el DNS no resuelve github.com. Revisa tu red e intenta de nuevo."
+        is java.net.SocketTimeoutException ->
+            "La conexion tardo demasiado. Intenta de nuevo."
+        else -> e.message ?: "Error de red"
     }
 
     fun loginWithPat(rawToken: String) {
@@ -200,7 +211,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         val login = withContext(Dispatchers.IO) {
             runCatching { auth.fetchLogin(token) }
         }.getOrElse { e ->
-            _auth.update { it.copy(busy = false, deviceCode = null, message = "Token invalido: ${e.message}") }
+            _auth.update { it.copy(busy = false, deviceCode = null, message = friendlyError(e)) }
             return
         }
         tokenStore.save(token, login, method)
