@@ -14,16 +14,17 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Login
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.CloudUpload
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material3.Button
@@ -77,8 +78,9 @@ fun MainScreen(
     viewModel: MainViewModel,
     onRequestRole: () -> Unit
 ) {
-    val tabs = listOf("Proteccion", "Lista SPAM", "Historial", "Cuenta")
+    val tabs = listOf("Proteccion", "Lista SPAM", "Historial")
     var selectedTab by remember { mutableIntStateOf(0) }
+    var showAccount by remember { mutableStateOf(false) }
 
     val state by viewModel.state.collectAsStateWithLifecycle()
     val authState by viewModel.authState.collectAsStateWithLifecycle()
@@ -108,27 +110,38 @@ fun MainScreen(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Filled.Shield, contentDescription = null)
                         Spacer(Modifier.width(8.dp))
-                        Text("OpenCallShield")
+                        Text(if (showAccount) "Colaborar" else "OpenCallShield")
+                    }
+                },
+                actions = {
+                    IconButton(onClick = { showAccount = !showAccount }) {
+                        Icon(
+                            if (showAccount) Icons.Filled.Close else Icons.Filled.MoreVert,
+                            contentDescription = if (showAccount) "Cerrar" else "Mas opciones"
+                        )
                     }
                 }
             )
         }
     ) { padding ->
         Column(Modifier.padding(padding).fillMaxSize()) {
-            ScrollableTabRow(selectedTabIndex = selectedTab, edgePadding = 0.dp) {
-                tabs.forEachIndexed { index, title ->
-                    Tab(
-                        selected = selectedTab == index,
-                        onClick = { selectedTab = index },
-                        text = { Text(title) }
-                    )
+            if (showAccount) {
+                AccountTab(authState, viewModel)
+            } else {
+                ScrollableTabRow(selectedTabIndex = selectedTab, edgePadding = 0.dp) {
+                    tabs.forEachIndexed { index, title ->
+                        Tab(
+                            selected = selectedTab == index,
+                            onClick = { selectedTab = index },
+                            text = { Text(title) }
+                        )
+                    }
                 }
-            }
-            when (selectedTab) {
-                0 -> ProtectionTab(state, viewModel, onRequestRole, spamNumbers.size, blockedCalls.size)
-                1 -> SpamListTab(spamNumbers, authState, state.syncing, viewModel)
-                2 -> HistoryTab(blockedCalls, spamNumbers, viewModel)
-                else -> AccountTab(authState, viewModel)
+                when (selectedTab) {
+                    0 -> ProtectionTab(state, viewModel, onRequestRole, spamNumbers.size, blockedCalls.size)
+                    1 -> SpamListTab(spamNumbers, authState, state.syncing, viewModel) { showAccount = true }
+                    else -> HistoryTab(blockedCalls, spamNumbers, viewModel)
+                }
             }
         }
     }
@@ -278,7 +291,8 @@ private fun SpamListTab(
     numbers: List<SpamNumber>,
     authState: AuthUiState,
     syncing: Boolean,
-    viewModel: MainViewModel
+    viewModel: MainViewModel,
+    onOpenCollaborate: () -> Unit
 ) {
     var input by remember { mutableStateOf("") }
     val localCount = numbers.count { it.source == "local" }
@@ -302,16 +316,16 @@ private fun SpamListTab(
         }
 
         Spacer(Modifier.size(8.dp))
-        Button(
-            onClick = { viewModel.contribute() },
+        OutlinedButton(
+            onClick = { if (authState.loggedIn) viewModel.contribute() else onOpenCollaborate() },
             modifier = Modifier.fillMaxWidth(),
-            enabled = authState.loggedIn && localCount > 0 && !authState.busy
+            enabled = !authState.busy
         ) {
             Icon(Icons.Filled.CloudUpload, contentDescription = null)
             Spacer(Modifier.width(8.dp))
             Text(
                 if (authState.loggedIn) "Aportar $localCount numero(s) a la base publica"
-                else "Inicia sesion (pestana Cuenta) para aportar"
+                else "Aportar a la base publica (opcional)"
             )
         }
 
@@ -522,18 +536,19 @@ private fun AccountTab(
         }
 
         Text(
-            "Inicia sesion con GitHub para aportar tu lista de SPAM a la base publica.",
+            "Colaborar es OPCIONAL. La app funciona completa sin esto. Conecta una " +
+                "cuenta solo si quieres aportar numeros a la base publica colaborativa.",
             style = MaterialTheme.typography.bodyMedium
         )
 
         // --- Device Flow ---
         Card(Modifier.fillMaxWidth()) {
             Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text("Opcion A - GitHub (recomendado)", style = MaterialTheme.typography.titleSmall)
+                Text("Opcion A - Codigo de dispositivo", style = MaterialTheme.typography.titleSmall)
                 OutlinedTextField(
                     value = authState.clientId,
                     onValueChange = viewModel::setClientId,
-                    label = { Text("Client ID de la OAuth App") },
+                    label = { Text("Client ID (publico)") },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true
                 )
@@ -542,12 +557,10 @@ private fun AccountTab(
                     modifier = Modifier.fillMaxWidth(),
                     enabled = !authState.busy
                 ) {
-                    Icon(Icons.AutoMirrored.Filled.Login, contentDescription = null)
-                    Spacer(Modifier.width(8.dp))
-                    Text("Iniciar sesion con GitHub")
+                    Text("Conectar")
                 }
                 Text(
-                    "Necesita una OAuth App con Device Flow activado. El Client ID es publico.",
+                    "Se abrira github.com/login/device para autorizar. El Client ID es publico.",
                     style = MaterialTheme.typography.bodySmall
                 )
             }
@@ -572,7 +585,7 @@ private fun AccountTab(
                     modifier = Modifier.fillMaxWidth(),
                     enabled = !authState.busy
                 ) {
-                    Text("Entrar con token")
+                    Text("Conectar con token")
                 }
                 Text(
                     "Crea el token en github.com/settings/tokens con permiso public_repo.",

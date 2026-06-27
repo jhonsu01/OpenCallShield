@@ -27,8 +27,8 @@ android {
         minSdk = 29
         targetSdk = 35
         // En CI se derivan del tag (vX.Y.Z); en local usan estos valores por defecto.
-        versionCode = (project.findProperty("versionCodeOverride") as String?)?.toInt() ?: 8
-        versionName = (project.findProperty("versionNameOverride") as String?) ?: "1.3.2"
+        versionCode = (project.findProperty("versionCodeOverride") as String?)?.toInt() ?: 10304
+        versionName = (project.findProperty("versionNameOverride") as String?) ?: "1.3.4"
         vectorDrawables { useSupportLibrary = true }
     }
 
