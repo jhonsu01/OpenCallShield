@@ -376,6 +376,26 @@
       "number": "033957767878",
       "reports": 1,
       "tag": "spam"
+    },
+    {
+      "number": "03398383662",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "+573234009335",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03397039973",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "033930227398",
+      "reports": 1,
+      "tag": "spam"
     }
   ]
 }
