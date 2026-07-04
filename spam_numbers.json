@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updated_at": "2026-07-03",
+  "updated_at": "2026-07-04",
   "numbers": [
     {
       "number": "+12025550143",
@@ -284,6 +284,96 @@
     },
     {
       "number": "3130993076",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "033989544003",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "033945670953",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03393284669",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03395706311",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03393159715",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "033999107456",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "033979794341",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "033988541611",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "033986927644",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03398462478",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "30008604376",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03393556882",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "033917306650",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "033920854576",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "033912036782",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03393932853",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03394171448",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "033957767878",
       "reports": 1,
       "tag": "spam"
     }
