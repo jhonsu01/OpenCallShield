@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updated_at": "2026-07-06",
+  "updated_at": "2026-07-07",
   "numbers": [
     {
       "number": "+12025550143",
@@ -454,6 +454,101 @@
     },
     {
       "number": "3170791669",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3230713272",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03390170952",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "573251027650",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3269164799",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "1573398133564",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "30297856251",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3010643156",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03398074217",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3238759172",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3131927642",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3120072825",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3186367227",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "033998875837",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3231680926",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03398887024",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3169568562",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03397670795",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3177887508",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03394519898",
       "reports": 1,
       "tag": "spam"
     }
