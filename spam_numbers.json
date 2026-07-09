@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updated_at": "2026-07-07",
+  "updated_at": "2026-07-09",
   "numbers": [
     {
       "number": "+12025550143",
@@ -549,6 +549,106 @@
     },
     {
       "number": "03394519898",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "033991194654",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3201254814",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03397357966",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3131092360",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03393295044",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03393731436",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03392699833",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03393759158",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03399270925",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03392139974",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03399907971",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03391027692",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3121281455",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3110074852",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "033945065793",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3110043829",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "033915046411",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03393819999",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3210198376",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "033929067011",
       "reports": 1,
       "tag": "spam"
     }
