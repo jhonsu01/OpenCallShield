@@ -56,12 +56,12 @@ jobs:
           -PversionNameOverride=${{ steps.ver.outputs.name }}
           -PversionCodeOverride=${{ steps.ver.outputs.code }}
 
-      - name: Subir a Google Play (track interno)
+      - name: Subir a Google Play (produccion)
         uses: r0adkll/upload-google-play@v1
         with:
           serviceAccountJsonPlainText: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
           packageName: com.jhonsu01.opencallshield
           releaseFiles: app/build/outputs/bundle/release/app-release.aab
-          track: internal
+          track: production
           status: completed
           releaseName: ${{ steps.ver.outputs.name }}
