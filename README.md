@@ -16,7 +16,7 @@ Alternativa privacidad-first y descentralizada a Truecaller.
 - **Google Play:** https://play.google.com/store/apps/details?id=com.jhonsu01.opencallshield
 - **APK directo:** descarga el `.apk` desde la sección [**Releases**](https://github.com/jhonsu01/OpenCallShield/releases) (cada versión publica el APK e instalable sin la tienda).
 
-> Si el enlace de Play aún no abre, la app está **en revisión**; estará disponible en cuanto Google la apruebe.
+> ✅ **Ya disponible en Google Play.**
 
 ## ✨ Funciones
 
@@ -123,3 +123,9 @@ en `spam_numbers.json`, actualiza `"updated_at"` y haz commit con `Closes #N`.
 ## 🔓 Licencia
 
 MIT — ver [LICENSE](LICENSE).
+
+## ❤️ Apoyar el proyecto
+
+OpenCallShield es **gratuito y open source**. Si te resulta útil, puedes apoyar su desarrollo con una donación:
+
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/V7V81LV7GX)
