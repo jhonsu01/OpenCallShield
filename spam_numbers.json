@@ -1031,6 +1031,31 @@
       "number": "3141014254",
       "reports": 1,
       "tag": "spam"
+    },
+    {
+      "number": "03398477687",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3201226661",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03395236409",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3101540784",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3191423027",
+      "reports": 1,
+      "tag": "spam"
     }
   ]
 }
