@@ -1091,6 +1091,16 @@
       "number": "3231821063",
       "reports": 1,
       "tag": "spam"
+    },
+    {
+      "number": "3501972747",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03399568513",
+      "reports": 1,
+      "tag": "spam"
     }
   ]
 }
