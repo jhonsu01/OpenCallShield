@@ -1106,6 +1106,36 @@
       "number": "03399831301",
       "reports": 1,
       "tag": "spam"
+    },
+    {
+      "number": "03396804293",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03395456186",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03399038298",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03399227254",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03392013027",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03390866832",
+      "reports": 1,
+      "tag": "spam"
     }
   ]
 }
