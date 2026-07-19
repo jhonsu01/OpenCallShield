@@ -1,4 +1,4 @@
-# 🛡️ OpenCallShield
+# <img src="playstore/icon_512.png" width="44" align="top" alt="OpenCallShield"/> OpenCallShield
 
 [![Android CI](https://github.com/jhonsu01/OpenCallShield/actions/workflows/android.yml/badge.svg)](https://github.com/jhonsu01/OpenCallShield/actions/workflows/android.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
