@@ -119,6 +119,15 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         _state.update { it.copy(prefixes = value) }
     }
 
+    /** Marca o desmarca el bloqueo de las llamadas de un pais (por su prefijo internacional). */
+    fun toggleCountryPrefix(dialCode: String) {
+        val current = settings.prefixes().toMutableList()
+        if (!current.remove(dialCode)) current.add(dialCode)
+        val joined = current.joinToString(",")
+        settings.prefixList = joined
+        _state.update { it.copy(prefixes = joined) }
+    }
+
     fun setSyncUrl(value: String) {
         settings.syncUrl = value
         _state.update { it.copy(syncUrl = value) }

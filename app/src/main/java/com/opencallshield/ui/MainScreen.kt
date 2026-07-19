@@ -2,6 +2,8 @@ package com.opencallshield.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,6 +25,8 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.CloudUpload
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Shield
@@ -31,6 +35,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -63,6 +68,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.opencallshield.data.BlockedCall
+import com.opencallshield.data.Countries
 import com.opencallshield.data.SpamNumber
 import com.opencallshield.data.SpamRepository
 import java.text.SimpleDateFormat
@@ -71,6 +77,8 @@ import java.util.Locale
 
 private const val REPO_URL = "https://github.com/jhonsu01/OpenCallShield"
 private const val KOFI_URL = "https://ko-fi.com/V7V81LV7GX"
+private const val GUIDE_URL =
+    "https://github.com/jhonsu01/OpenCallShield/blob/main/docs/CREAR_BASE_COLABORATIVA.md"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -147,6 +155,7 @@ fun MainScreen(
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun ProtectionTab(
     state: SettingsUiState,
@@ -156,6 +165,7 @@ private fun ProtectionTab(
     blockedCount: Int
 ) {
     val uriHandler = LocalUriHandler.current
+    var advancedOpen by remember { mutableStateOf(false) }
     Column(
         Modifier
             .fillMaxSize()
@@ -211,23 +221,31 @@ private fun ProtectionTab(
             onCheckedChange = viewModel::setSilence
         )
 
-        OutlinedTextField(
-            value = state.prefixes,
-            onValueChange = viewModel::setPrefixes,
-            label = { Text("Prefijos en lista negra (separados por coma)") },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true
+        // --- Selector de paises con banderas ---
+        Text("Bloquear llamadas de estos paises", style = MaterialTheme.typography.titleSmall)
+        Text(
+            "Toca las banderas de los paises cuyas llamadas NO quieres recibir. " +
+                "No necesitas escribir prefijos.",
+            style = MaterialTheme.typography.bodySmall
         )
+        val activePrefixes = remember(state.prefixes) {
+            state.prefixes.split(",").map { it.trim() }.filter { it.isNotEmpty() }.toSet()
+        }
+        FlowRow(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            Countries.ALL.forEach { c ->
+                FilterChip(
+                    selected = c.dialCode in activePrefixes,
+                    onClick = { viewModel.toggleCountryPrefix(c.dialCode) },
+                    label = { Text("${c.flag} ${c.name}") }
+                )
+            }
+        }
 
         HorizontalDivider()
 
-        OutlinedTextField(
-            value = state.syncUrl,
-            onValueChange = viewModel::setSyncUrl,
-            label = { Text("URL de base colaborativa (JSON)") },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true
-        )
         OutlinedButton(
             onClick = { viewModel.syncNow() },
             modifier = Modifier.fillMaxWidth(),
@@ -239,6 +257,41 @@ private fun ProtectionTab(
                 Text("Sincronizando...")
             } else {
                 Text("Sincronizar ahora")
+            }
+        }
+
+        // --- Ajustes avanzados (colapsable): URL de la base y prefijos manuales ---
+        TextButton(
+            onClick = { advancedOpen = !advancedOpen },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Icon(
+                if (advancedOpen) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
+                contentDescription = null
+            )
+            Spacer(Modifier.width(8.dp))
+            Text("Ajustes avanzados")
+        }
+        if (advancedOpen) {
+            OutlinedTextField(
+                value = state.syncUrl,
+                onValueChange = viewModel::setSyncUrl,
+                label = { Text("URL de la base colaborativa (JSON)") },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true
+            )
+            OutlinedTextField(
+                value = state.prefixes,
+                onValueChange = viewModel::setPrefixes,
+                label = { Text("Prefijos manuales (avanzado, separados por coma)") },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true
+            )
+            TextButton(
+                onClick = { uriHandler.openUri(GUIDE_URL) },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("¿Como crear tu propia base colaborativa? (guia)")
             }
         }
 
