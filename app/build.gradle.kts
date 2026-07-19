@@ -27,8 +27,8 @@ android {
         minSdk = 29
         targetSdk = 35
         // En CI se derivan del tag (vX.Y.Z); en local usan estos valores por defecto.
-        versionCode = (project.findProperty("versionCodeOverride") as String?)?.toInt() ?: 10400
-        versionName = (project.findProperty("versionNameOverride") as String?) ?: "1.4.0"
+        versionCode = (project.findProperty("versionCodeOverride") as String?)?.toInt() ?: 10401
+        versionName = (project.findProperty("versionNameOverride") as String?) ?: "1.4.1"
         vectorDrawables { useSupportLibrary = true }
     }
 
@@ -104,6 +104,12 @@ dependencies {
 
     implementation("androidx.work:work-runtime-ktx:2.9.0")
     implementation("androidx.security:security-crypto:1.1.0-alpha06")
+
+    // Actualizaciones dentro de la app (aviso de nueva version desde Google Play).
+    implementation("com.google.android.play:app-update-ktx:2.1.0")
+    // Fuerza una version moderna de fragment (app-update arrastra una antigua que
+    // rompe el lint InvalidFragmentVersionForActivityResult).
+    implementation("androidx.fragment:fragment:1.8.2")
 
     debugImplementation("androidx.compose.ui:ui-tooling")
 }

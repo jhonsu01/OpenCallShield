@@ -166,6 +166,7 @@ private fun ProtectionTab(
 ) {
     val uriHandler = LocalUriHandler.current
     var advancedOpen by remember { mutableStateOf(false) }
+    var countriesOpen by remember { mutableStateOf(false) }
     Column(
         Modifier
             .fillMaxSize()
@@ -221,26 +222,42 @@ private fun ProtectionTab(
             onCheckedChange = viewModel::setSilence
         )
 
-        // --- Selector de paises con banderas ---
-        Text("Bloquear llamadas de estos paises", style = MaterialTheme.typography.titleSmall)
-        Text(
-            "Toca las banderas de los paises cuyas llamadas NO quieres recibir. " +
-                "No necesitas escribir prefijos.",
-            style = MaterialTheme.typography.bodySmall
-        )
+        // --- Selector de paises por bandera (colapsable) ---
         val activePrefixes = remember(state.prefixes) {
             state.prefixes.split(",").map { it.trim() }.filter { it.isNotEmpty() }.toSet()
         }
-        FlowRow(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(6.dp)
+        val countriesCount = Countries.ALL.count { it.dialCode in activePrefixes }
+        TextButton(
+            onClick = { countriesOpen = !countriesOpen },
+            modifier = Modifier.fillMaxWidth()
         ) {
-            Countries.ALL.forEach { c ->
-                FilterChip(
-                    selected = c.dialCode in activePrefixes,
-                    onClick = { viewModel.toggleCountryPrefix(c.dialCode) },
-                    label = { Text("${c.flag} ${c.name}") }
-                )
+            Icon(
+                if (countriesOpen) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
+                contentDescription = null
+            )
+            Spacer(Modifier.width(8.dp))
+            Text(
+                if (countriesCount > 0) "Bloquear llamadas por pais  ($countriesCount)"
+                else "Bloquear llamadas por pais"
+            )
+        }
+        if (countriesOpen) {
+            Text(
+                "Toca las banderas de los paises cuyas llamadas NO quieres recibir. " +
+                    "No necesitas escribir prefijos.",
+                style = MaterialTheme.typography.bodySmall
+            )
+            FlowRow(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                Countries.ALL.forEach { c ->
+                    FilterChip(
+                        selected = c.dialCode in activePrefixes,
+                        onClick = { viewModel.toggleCountryPrefix(c.dialCode) },
+                        label = { Text("${c.flag} ${c.name}") }
+                    )
+                }
             }
         }
 

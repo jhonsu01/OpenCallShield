@@ -13,6 +13,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import com.google.android.play.core.appupdate.AppUpdateManager
+import com.google.android.play.core.appupdate.AppUpdateManagerFactory
+import com.google.android.play.core.appupdate.AppUpdateOptions
+import com.google.android.play.core.install.InstallStateUpdatedListener
+import com.google.android.play.core.install.model.AppUpdateType
+import com.google.android.play.core.install.model.InstallStatus
+import com.google.android.play.core.install.model.UpdateAvailability
 import com.opencallshield.ui.MainScreen
 import com.opencallshield.ui.MainViewModel
 import com.opencallshield.ui.theme.OpenCallShieldTheme
@@ -29,9 +36,25 @@ class MainActivity : ComponentActivity() {
         ActivityResultContracts.StartActivityForResult()
     ) { /* resultado del rol gestionado por el sistema */ }
 
+    // --- Actualizaciones dentro de la app (Google Play In-App Updates) ---
+    private lateinit var appUpdateManager: AppUpdateManager
+
+    private val updateLauncher = registerForActivityResult(
+        ActivityResultContracts.StartIntentSenderForResult()
+    ) { /* resultado del flujo de actualizacion gestionado por Play */ }
+
+    private val installListener = InstallStateUpdatedListener { state ->
+        if (state.installStatus() == InstallStatus.DOWNLOADED) {
+            showUpdateReadyPrompt()
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         requestRuntimePermissions()
+
+        appUpdateManager = AppUpdateManagerFactory.create(this)
+        checkForAppUpdate()
 
         setContent {
             OpenCallShieldTheme {
@@ -67,5 +90,53 @@ class MainActivity : ComponentActivity() {
             val intent = roleManager.createRequestRoleIntent(RoleManager.ROLE_CALL_SCREENING)
             roleLauncher.launch(intent)
         }
+    }
+
+    /**
+     * Comprueba en Google Play si hay una nueva version y, si la hay, inicia la
+     * descarga flexible en segundo plano. Al terminar se avisa al usuario para reiniciar.
+     * (Solo funciona en apps instaladas desde Play Store.)
+     */
+    private fun checkForAppUpdate() {
+        appUpdateManager.appUpdateInfo.addOnSuccessListener { info ->
+            val available = info.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
+            if (available && info.isUpdateTypeAllowed(AppUpdateType.FLEXIBLE)) {
+                appUpdateManager.registerListener(installListener)
+                runCatching {
+                    appUpdateManager.startUpdateFlowForResult(
+                        info,
+                        updateLauncher,
+                        AppUpdateOptions.newBuilder(AppUpdateType.FLEXIBLE).build()
+                    )
+                }
+            }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Si una actualizacion quedo descargada (p. ej. al volver a abrir), ofrecer instalarla.
+        if (::appUpdateManager.isInitialized) {
+            appUpdateManager.appUpdateInfo.addOnSuccessListener { info ->
+                if (info.installStatus() == InstallStatus.DOWNLOADED) showUpdateReadyPrompt()
+            }
+        }
+    }
+
+    private fun showUpdateReadyPrompt() {
+        android.app.AlertDialog.Builder(this)
+            .setTitle("Actualizacion disponible")
+            .setMessage(
+                "Se descargo una nueva version de OpenCallShield. " +
+                    "Reinicia la app para aplicarla y ver las novedades."
+            )
+            .setPositiveButton("Reiniciar ahora") { _, _ -> appUpdateManager.completeUpdate() }
+            .setNegativeButton("Mas tarde", null)
+            .show()
+    }
+
+    override fun onDestroy() {
+        if (::appUpdateManager.isInitialized) appUpdateManager.unregisterListener(installListener)
+        super.onDestroy()
     }
 }
