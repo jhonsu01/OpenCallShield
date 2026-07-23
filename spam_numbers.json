@@ -1266,6 +1266,61 @@
       "number": "03390357111",
       "reports": 1,
       "tag": "spam"
+    },
+    {
+      "number": "03398134488",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03399001490",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "573181610914",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03393950863",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03395898261",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03396770402",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03396877148",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03397760477",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3201592383",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3026553379",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3198204170",
+      "reports": 1,
+      "tag": "spam"
     }
   ]
 }
