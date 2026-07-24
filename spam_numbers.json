@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updated_at": "2026-07-23",
+  "updated_at": "2026-07-24",
   "numbers": [
     {
       "number": "+12025550143",
@@ -1319,6 +1319,31 @@
     },
     {
       "number": "3198204170",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03393898832",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03396870594",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03394294855",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03393410456",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03399055182",
       "reports": 1,
       "tag": "spam"
     }
