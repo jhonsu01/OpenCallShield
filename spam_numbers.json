@@ -1431,6 +1431,51 @@
       "number": "00573393393099",
       "reports": 1,
       "tag": "spam"
+    },
+    {
+      "number": "3501220443",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03395884509",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3141917673",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03397770275",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03398448652",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03392927281",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03394001655",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3120749862",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3029892227",
+      "reports": 1,
+      "tag": "spam"
     }
   ]
 }
