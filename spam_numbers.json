@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updated_at": "2026-07-24",
+  "updated_at": "2026-07-25",
   "numbers": [
     {
       "number": "+12025550143",
@@ -1424,6 +1424,11 @@
     },
     {
       "number": "3121280425",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "00573393393099",
       "reports": 1,
       "tag": "spam"
     }
