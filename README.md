@@ -3,6 +3,10 @@
 [![Android CI](https://github.com/jhonsu01/OpenCallShield/actions/workflows/android.yml/badge.svg)](https://github.com/jhonsu01/OpenCallShield/actions/workflows/android.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
+<div align="center">
+  <img src="./assets/banner.png" alt="OpenCallShield Banner" width="100%" />
+</div>
+
 App Android open source (MIT) para **bloquear llamadas SPAM** mediante
 `CallScreeningService` (Android 10+), con base de datos local Room, motor de
 reglas de detección y sincronización con una base colaborativa pública en GitHub.
