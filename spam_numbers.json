@@ -1491,6 +1491,26 @@
       "number": "03398035663",
       "reports": 1,
       "tag": "spam"
+    },
+    {
+      "number": "03394555535",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03394608145",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03390768917",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03391644481",
+      "reports": 1,
+      "tag": "spam"
     }
   ]
 }
