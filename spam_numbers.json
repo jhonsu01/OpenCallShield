@@ -1526,6 +1526,31 @@
       "number": "3000887959",
       "reports": 1,
       "tag": "spam"
+    },
+    {
+      "number": "03396609179",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3221799826",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03390470806",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3102029334",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03397802170",
+      "reports": 1,
+      "tag": "spam"
     }
   ]
 }
