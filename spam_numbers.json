@@ -1581,6 +1581,51 @@
       "number": "03391287505",
       "reports": 1,
       "tag": "spam"
+    },
+    {
+      "number": "03395841686",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03394072822",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3110251399",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3120518551",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3111901133",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3112709070",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03396121955",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3190194617",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3000227780",
+      "reports": 1,
+      "tag": "spam"
     }
   ]
 }
