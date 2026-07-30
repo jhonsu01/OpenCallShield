@@ -1676,6 +1676,26 @@
       "number": "03398230100",
       "reports": 1,
       "tag": "spam"
+    },
+    {
+      "number": "3210299296",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3237156726",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3149716182",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3198398611",
+      "reports": 1,
+      "tag": "spam"
     }
   ]
 }
