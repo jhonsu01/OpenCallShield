@@ -1786,6 +1786,26 @@
       "number": "03397580574",
       "reports": 1,
       "tag": "spam"
+    },
+    {
+      "number": "3238534940",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03390750394",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3131662959",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03392573529",
+      "reports": 1,
+      "tag": "spam"
     }
   ]
 }
