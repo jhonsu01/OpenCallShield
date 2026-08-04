@@ -1841,6 +1841,26 @@
       "number": "3131060242",
       "reports": 1,
       "tag": "spam"
+    },
+    {
+      "number": "3221709954",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3120239064",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "+573256369590",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3246903420",
+      "reports": 1,
+      "tag": "spam"
     }
   ]
 }
