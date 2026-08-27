@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updated_at": "2026-08-26",
+  "updated_at": "2026-08-27",
   "numbers": [
     {
       "number": "+12025550143",
@@ -2789,6 +2789,36 @@
     },
     {
       "number": "03399001087",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "1573139497904",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03399958860",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03398125865",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03396366908",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03394064383",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03397928629",
       "reports": 1,
       "tag": "spam"
     }
