@@ -3301,6 +3301,36 @@
       "number": "03573111512169",
       "reports": 1,
       "tag": "spam"
+    },
+    {
+      "number": "3130976583",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03390243692",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03394306010",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "1573392250704",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3220369706",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3029763400",
+      "reports": 1,
+      "tag": "spam"
     }
   ]
 }
