@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updated_at": "2026-09-10",
+  "updated_at": "2026-09-11",
   "numbers": [
     {
       "number": "+12025550143",
@@ -3519,6 +3519,16 @@
     },
     {
       "number": "03395243076",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3238583629",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3248247266",
       "reports": 1,
       "tag": "spam"
     }
