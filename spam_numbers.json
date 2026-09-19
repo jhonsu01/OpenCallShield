@@ -3651,6 +3651,36 @@
       "number": "3123101797",
       "reports": 1,
       "tag": "spam"
+    },
+    {
+      "number": "952586362",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3156863720",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3149107021",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3130829570",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3000477689",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03395317441",
+      "reports": 1,
+      "tag": "spam"
     }
   ]
 }
