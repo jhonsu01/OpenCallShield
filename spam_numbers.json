@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updated_at": "2026-09-19",
+  "updated_at": "2026-09-24",
   "numbers": [
     {
       "number": "+12025550143",
@@ -3689,6 +3689,116 @@
     },
     {
       "number": "03394964303",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "0316031904148",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3130312916",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03395337216",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03397934889",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "16035978106",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03573119357481",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3029288008",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3247968625",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03573129257156",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03395812289",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3000124764",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3120277182",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3508379274",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03573129173040",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03397660467",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3222060283",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3123106551",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03395210270",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3248839559",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3216381896",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "00573121916302",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03399550580",
       "reports": 1,
       "tag": "spam"
     }
