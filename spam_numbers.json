@@ -3836,6 +3836,16 @@
       "number": "03573139922362",
       "reports": 1,
       "tag": "spam"
+    },
+    {
+      "number": "03573120020986",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03394379888",
+      "reports": 1,
+      "tag": "spam"
     }
   ]
 }
