@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updated_at": "2026-10-07",
+  "updated_at": "2026-10-09",
   "numbers": [
     {
       "number": "+12025550143",
@@ -4064,6 +4064,51 @@
     },
     {
       "number": "03390839963",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "+390712386020",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3009184304",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3009144223",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03391703501",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03573200234272",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3247868015",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03390069759",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "00573396637660",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3159596126",
       "reports": 1,
       "tag": "spam"
     }
