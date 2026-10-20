@@ -1,0 +1,29 @@
+OpenCallShield blockiert SPAM-Anrufe automatisch – ohne Werbung und mit Respekt für deine Privatsphäre. Die App ist Open Source (MIT-Lizenz): Der Code ist öffentlich und jeder kann ihn prüfen.
+
+SO FUNKTIONIERT ES
+Die App nutzt den offiziellen Anruffilter-Dienst von Android (CallScreeningService, ab Android 10). Bei einem eingehenden Anruf entscheidet OpenCallShield direkt auf deinem Gerät, ob er durchgelassen, stummgeschaltet oder abgelehnt wird – nach deinen Regeln.
+
+ERKENNUNGSREGELN
+• Anrufe von gespeicherten Kontakten klingeln immer.
+• Als SPAM gemeldete Nummern (von dir oder aus der Gemeinschaftsliste) werden blockiert.
+• Blockiere ganze Länder mit einem Tipp auf ihre Flagge – ohne Vorwahlen einzutippen.
+• Optional: unbekannte Nummern blockieren, die nicht in deinen Kontakten sind.
+Du entscheidest, ob der Anruf abgelehnt oder nur stummgeschaltet wird (er erscheint dann als verpasst).
+
+GEMEINSCHAFTSLISTE
+Die App synchronisiert eine öffentliche Liste von SPAM-Nummern auf GitHub. Wenn du möchtest, kannst du deine Meldungen beitragen und so anderen helfen: Geteilt werden nur als SPAM markierte Nummern, niemals deine Kontakte. Eine Anmeldung ist optional; die App funktioniert vollständig ohne Konto.
+
+DATENSCHUTZ ZUERST
+• Keine eigenen Server: Alles wird auf deinem Telefon verarbeitet.
+• Keine Werbung, keine Tracker.
+• Kein Zugriff auf deine Anrufliste.
+• Deine Kontakte werden nur lokal abgefragt, damit sie nie blockiert werden.
+
+IN 9 SPRACHEN VERFÜGBAR
+English, Español, Português, Français, Deutsch, Русский, 中文, 日本語 und 한국어. Die Sprache änderst du direkt in der App (Globus-Symbol).
+
+OPEN SOURCE
+OpenCallShield ist kostenlos und Open Source. Sieh dir das Projekt an, schlage Verbesserungen vor oder erstelle deine eigene Version:
+https://github.com/jhonsu01/OpenCallShield
+
+Eine transparente, dezentrale Alternative zum Schutz vor Telefon-SPAM.

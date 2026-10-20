@@ -20,7 +20,7 @@ object GitHubContributor {
         repo: String,
         numbers: List<SpamNumber>
     ): String {
-        require(numbers.isNotEmpty()) { "No hay numeros para aportar." }
+        require(numbers.isNotEmpty()) { "No numbers to contribute." }
 
         val jsonArray = JSONArray()
         numbers.forEach { n ->
@@ -33,8 +33,10 @@ object GitHubContributor {
         }
 
         val body = buildString {
-            append("Propuesta de numeros para `spam_numbers.json`, enviada desde la app OpenCallShield.\n\n")
-            append("Cantidad: ${numbers.size}\n\n")
+            // El Issue lo procesa el mantenedor (y .github/scripts/integrate_spam.py, que
+            // solo lee el bloque ```json```), asi que el texto va en ingles, idioma del repo.
+            append("Numbers proposed for `spam_numbers.json`, sent from the OpenCallShield app.\n\n")
+            append("Count: ${numbers.size}\n\n")
             append("```json\n")
             append(jsonArray.toString(2))
             append("\n```\n")
@@ -44,7 +46,7 @@ object GitHubContributor {
         // repo. Un usuario externo (no colaborador) puede abrir un Issue, pero no
         // etiquetarlo; incluir labels provocaba un 403. El titulo ya identifica el aporte.
         val payload = JSONObject()
-            .put("title", "Aporte a base SPAM: ${numbers.size} numero(s)")
+            .put("title", "SPAM database contribution: ${numbers.size} number(s)")
             .put("body", body)
 
         val res = Http.request(

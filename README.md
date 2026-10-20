@@ -1,69 +1,82 @@
 # <img src="playstore/icon_512.png" width="44" align="top" alt="OpenCallShield"/> OpenCallShield
 
-[![Android CI](https://github.com/jhonsu01/OpenCallShield/actions/workflows/android.yml/badge.svg)](https://github.com/jhonsu01/OpenCallShield/actions/workflows/android.yml)
+**English** · [Español](docs/i18n/README.es.md) · [Português](docs/i18n/README.pt.md) · [Français](docs/i18n/README.fr.md) · [Deutsch](docs/i18n/README.de.md) · [Русский](docs/i18n/README.ru.md) · [中文](docs/i18n/README.zh.md) · [日本語](docs/i18n/README.ja.md) · [한국어](docs/i18n/README.ko.md)
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 <div align="center">
   <img src="./assets/banner.png" alt="OpenCallShield Banner" width="100%" />
 </div>
 
-App Android open source (MIT) para **bloquear llamadas SPAM** mediante
-`CallScreeningService` (Android 10+), con base de datos local Room, motor de
-reglas de detección y sincronización con una base colaborativa pública en GitHub.
+Open source (MIT) Android app that **blocks SPAM calls** using `CallScreeningService`
+(Android 10+), with a local Room database, a detection rules engine and sync with a
+public collaborative list hosted on GitHub.
 
-Alternativa privacidad-first y descentralizada a Truecaller.
+A privacy-first, decentralized alternative to Truecaller.
 
-## ⬇️ Descargar
+## ⬇️ Download
 
-<a href="https://play.google.com/store/apps/details?id=com.jhonsu01.opencallshield"><img alt="Disponible en Google Play" src="https://play.google.com/intl/en_us/badges/static/images/badges/es_badge_web_generic.png" height="60"/></a>
+<a href="https://play.google.com/store/apps/details?id=com.jhonsu01.opencallshield"><img alt="Get it on Google Play" src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" height="60"/></a>
 
 - **Google Play:** https://play.google.com/store/apps/details?id=com.jhonsu01.opencallshield
-- **APK directo:** descarga el `.apk` desde la sección [**Releases**](https://github.com/jhonsu01/OpenCallShield/releases) (cada versión publica el APK e instalable sin la tienda).
+- **Direct APK:** download the `.apk` from [**Releases**](https://github.com/jhonsu01/OpenCallShield/releases).
 
-> ✅ **Ya disponible en Google Play.**
+## 📱 Screenshots
 
-## ✨ Funciones
+<p>
+  <img src="playstore/screenshots/en-US/01_protection.png" width="19%"/>
+  <img src="playstore/screenshots/en-US/02_countries.png" width="19%"/>
+  <img src="playstore/screenshots/en-US/03_spam_list.png" width="19%"/>
+  <img src="playstore/screenshots/en-US/04_history.png" width="19%"/>
+  <img src="playstore/screenshots/en-US/05_language.png" width="19%"/>
+</p>
 
-- **Bloqueo automático** de llamadas vía `CallScreeningService` (rechazar o silenciar).
-- **Motor de reglas:** contacto conocido → permitir; número reportado → bloquear;
-  prefijo en lista negra → bloquear; número fuera de contactos → opcional.
-- **Base local** Room con números reportados.
-- **Sincronización** con un JSON público en GitHub (descarga diaria vía WorkManager + manual).
-- **Reportes** locales del usuario e historial de llamadas filtradas.
-- **UI** en Jetpack Compose (Material 3).
+Screenshots in every language are in [`playstore/screenshots/`](playstore/screenshots).
+
+## ✨ Features
+
+- **Automatic blocking** through `CallScreeningService` (reject or silence).
+- **Rules engine:** known contact → allow; reported number → block;
+  blacklisted prefix → block; number not in contacts → optional.
+- **Block by country** with one tap on the flag (no prefixes to type).
+- **Local Room database** of reported numbers.
+- **Sync** with a public JSON on GitHub (daily via WorkManager + manual).
+- **Reports** and history of filtered calls (add / remove numbers with one tap).
+- **9 languages:** English, Español, Português, Français, Deutsch, Русский, 中文, 日本語, 한국어 —
+  pick one from the 🌐 icon in the app or from Android's per-app language settings.
+- **UI** in Jetpack Compose (Material 3).
 
 ## 🏗️ Stack
 
-Kotlin · Jetpack Compose (Material 3) · Room · WorkManager · MVVM · `CallScreeningService`
+Kotlin · Jetpack Compose (Material 3) · Room · WorkManager · AppCompat (per-app language) · MVVM · `CallScreeningService` · targetSdk 36 (Android 16)
 
-## 📦 Compilar
+## 📦 Build
 
 ```bash
-# Requiere JDK 17 y Android SDK (compileSdk 34)
-./gradlew assembleDebug      # APK de depuración instalable
-./gradlew assembleRelease    # APK de release (requiere firma)
+# Requires JDK 17 and the Android SDK (compileSdk 36)
+./gradlew assembleDebug      # installable debug APK
+./gradlew assembleRelease    # release APK (needs signing)
+./gradlew bundleRelease      # AAB for Google Play
 ```
 
-El APK queda en `app/build/outputs/apk/`. La CI (GitHub Actions) también lo compila
-en cada push y lo adjunta como artefacto; al crear un tag `vX.Y.Z` publica un Release
-con el APK.
+Outputs are in `app/build/outputs/`.
 
-## 📲 Uso
+## 📲 Usage
 
-1. Instala el APK.
-2. Concede permisos de contactos / teléfono.
-3. Pulsa **"Activar como app de filtrado de llamadas"** y acepta el rol en Android.
-4. Ajusta las reglas y/o sincroniza la base colaborativa.
+1. Install the app.
+2. Grant the contacts permission (so your contacts are never blocked).
+3. Tap **"Set as call screening app"** and accept the role in Android.
+4. Adjust the rules, pick countries to block and/or sync the collaborative list.
 
-## 🌐 Base colaborativa
+## 🌐 Collaborative list
 
-La app sincroniza desde [`spam_numbers.json`](spam_numbers.json) de este mismo repo:
+The app syncs from [`spam_numbers.json`](spam_numbers.json) in this repository:
 
 ```
 https://raw.githubusercontent.com/jhonsu01/OpenCallShield/main/spam_numbers.json
 ```
 
-Formato:
+Format:
 
 ```json
 {
@@ -75,61 +88,46 @@ Formato:
 }
 ```
 
-Para ampliar la base, edita `spam_numbers.json` (o acepta aportes de la comunidad).
-La URL es configurable desde la propia app.
+The URL can be changed from the app (Advanced settings), so anyone can run their own list
+([guide, in Spanish](docs/CREAR_BASE_COLABORATIVA.md)).
 
-## 🔑 Aportar desde la app (login con GitHub)
+## 🔑 Contributing from the app (optional GitHub sign-in)
 
-Desde la pestaña **Cuenta** el usuario puede iniciar sesión con GitHub y, desde
-**Lista SPAM**, pulsar **"Aportar a la base pública"**: la app abre un **Issue** en el
-repo con los números reportados en formato JSON, listos para integrar en `spam_numbers.json`.
-Cualquiera que clone o haga fork puede aportar a su propio repo cambiando el destino.
+From **⋮ → Collaborate** you can sign in with GitHub and then, in **SPAM list**, tap
+**"Contribute to the public database"**: the app opens an **Issue** in this repo with your
+reported numbers as JSON, ready to merge into `spam_numbers.json`. Signing in is optional:
+the app works fully without it.
 
-Dos formas de iniciar sesión (sin servidor/backend):
+Two ways to sign in (no server/backend):
 
-### Opción A — OAuth Device Flow (recomendado)
+### Option A — OAuth Device Flow (recommended)
 
-1. En GitHub: **Settings → Developer settings → OAuth Apps → New OAuth App**.
-   - *Application name:* OpenCallShield
-   - *Homepage URL:* `https://github.com/jhonsu01/OpenCallShield`
-   - *Authorization callback URL:* `https://github.com/jhonsu01/OpenCallShield` (no se usa en Device Flow)
-2. Tras crearla, en la página de la app marca **Enable Device Flow** y guarda.
-3. Copia el **Client ID** (es público, no es secreto).
-4. En la app → pestaña **Cuenta** → pega el Client ID y pulsa **Iniciar sesión con GitHub**.
-   Sigue el código en `github.com/login/device`.
+1. On GitHub: **Settings → Developer settings → OAuth Apps → New OAuth App**, then
+   enable **Device Flow**.
+2. Copy the **Client ID** (it is public, not a secret).
+3. In the app → **Collaborate** → paste the Client ID, tap **Connect** and enter the code
+   at `github.com/login/device`.
 
-> El Client ID puede fijarse por defecto en `SettingsStore.DEFAULT_CLIENT_ID`
-> (`app/src/main/java/com/opencallshield/data/SettingsStore.kt`) para que venga precargado.
+### Option B — Personal access token (PAT)
 
-### Opción B — Token personal (PAT)
+1. GitHub → **Settings → Developer settings → Personal access tokens** → create one with
+   the **`public_repo`** scope.
+2. In the app → **Collaborate** → paste it and tap **Connect with token**.
 
-1. GitHub → **Settings → Developer settings → Personal access tokens** → crea uno con
-   scope **`public_repo`**.
-2. En la app → pestaña **Cuenta** → pégalo en *"Entrar con token"*.
+The token is stored **encrypted** on the device (`EncryptedSharedPreferences`) and is only
+sent to the GitHub API.
 
-El token se guarda **cifrado** en el dispositivo (`EncryptedSharedPreferences`); nunca
-se sube a ningún sitio salvo a la propia API de GitHub.
+## 🛠️ Reviewing contributions (maintainer)
 
-## 🛠️ Aprobar aportes (mantenedor)
+Contributions arrive as **Issues** with a JSON block. Copy the numbers into
+`spam_numbers.json`, update `"updated_at"` and commit with `Closes #N`.
 
-Los aportes llegan como **Issues** con un bloque JSON. Para integrarlos a la base con
-**un clic**, el repo incluye la Action [`integrate-spam.yml`](.github/workflows/integrate-spam.yml):
+## 🔓 License
 
-1. Crea una etiqueta llamada **`aprobado`** en el repo (una sola vez):
-   *Issues → Labels → New label → `aprobado`*.
-2. Revisa el Issue de aporte y, si los números son correctos, **aplícale la etiqueta `aprobado`**.
-3. La Action lee el JSON, lo **fusiona en `spam_numbers.json`** (sin duplicados, sumando
-   reportes), hace commit en `main` y **cierra el Issue** con un comentario de confirmación.
+MIT — see [LICENSE](LICENSE). Privacy policy: [PRIVACY.md](PRIVACY.md).
 
-Si prefieres hacerlo a mano: copia el bloque JSON del Issue, pégalo dentro de `"numbers"`
-en `spam_numbers.json`, actualiza `"updated_at"` y haz commit con `Closes #N`.
+## ❤️ Support the project
 
-## 🔓 Licencia
-
-MIT — ver [LICENSE](LICENSE).
-
-## ❤️ Apoyar el proyecto
-
-OpenCallShield es **gratuito y open source**. Si te resulta útil, puedes apoyar su desarrollo con una donación:
+OpenCallShield is **free and open source**. If you find it useful, you can support its development:
 
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/V7V81LV7GX)

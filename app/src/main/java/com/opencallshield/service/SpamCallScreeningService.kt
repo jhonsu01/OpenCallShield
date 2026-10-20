@@ -42,7 +42,8 @@ class SpamCallScreeningService : CallScreeningService() {
 
             if (decision is SpamDetector.Decision.Block) {
                 repo.logBlocked(
-                    number = number ?: "(oculto)",
+                    // Vacio = numero oculto; la UI muestra el texto traducido.
+                    number = number.orEmpty(),
                     reason = decision.reason,
                     silenced = decision.silence
                 )

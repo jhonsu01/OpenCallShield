@@ -3,6 +3,7 @@ package com.opencallshield.ui
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.opencallshield.R
 import com.opencallshield.auth.GitHubAuthManager
 import com.opencallshield.data.AppDatabase
 import com.opencallshield.data.BlockedCall
@@ -32,7 +33,7 @@ data class SettingsUiState(
     val prefixes: String = SettingsStore.DEFAULT_PREFIXES,
     val syncUrl: String = SettingsStore.DEFAULT_SYNC_URL,
     val syncing: Boolean = false,
-    val message: String? = null
+    val message: UiText? = null
 )
 
 data class AuthUiState(
@@ -42,7 +43,7 @@ data class AuthUiState(
     val clientId: String = "",
     val deviceCode: GitHubAuthManager.DeviceCode? = null,
     val busy: Boolean = false,
-    val message: String? = null
+    val message: UiText? = null
 )
 
 class MainViewModel(app: Application) : AndroidViewModel(app) {
@@ -139,9 +140,9 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
             try {
                 val remote = GitHubSync.fetch(settings.syncUrl)
                 repo.mergeRemote(remote)
-                "Sincronizado: ${remote.size} numeros recibidos"
+                UiText(R.string.msg_synced, listOf(remote.size))
             } catch (e: Exception) {
-                "Error al sincronizar: ${e.message ?: "desconocido"}"
+                UiText(R.string.msg_sync_error, listOf(e.message ?: UiText(R.string.msg_unknown_error)))
             }
         }
         _state.update { it.copy(syncing = false, message = message) }
@@ -159,7 +160,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     fun startDeviceLogin() {
         val clientId = settings.githubClientId.trim()
         if (clientId.isEmpty()) {
-            _auth.update { it.copy(message = "Configura el Client ID de la OAuth App primero.") }
+            _auth.update { it.copy(message = UiText(R.string.msg_need_client_id)) }
             return
         }
         pollJob?.cancel()
@@ -196,26 +197,39 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
                 is GitHubAuthManager.PollResult.SlowDown -> interval = result.interval
                 is GitHubAuthManager.PollResult.Error -> {
                     // Error del protocolo OAuth (codigo expirado o acceso denegado): abortar.
-                    _auth.update { it.copy(busy = false, deviceCode = null, message = result.message) }
+                    _auth.update {
+                        it.copy(busy = false, deviceCode = null, message = pollErrorText(result))
+                    }
                     return
                 }
             }
         }
-        _auth.update { it.copy(busy = false, deviceCode = null, message = "El codigo expiro, intenta de nuevo.") }
+        _auth.update {
+            it.copy(busy = false, deviceCode = null, message = UiText(R.string.msg_code_expired))
+        }
     }
 
-    private fun friendlyError(e: Throwable): String = when (e) {
-        is java.net.UnknownHostException ->
-            "Sin conexion o el DNS no resuelve github.com. Revisa tu red e intenta de nuevo."
-        is java.net.SocketTimeoutException ->
-            "La conexion tardo demasiado. Intenta de nuevo."
-        else -> e.message ?: "Error de red"
+    private fun pollErrorText(error: GitHubAuthManager.PollResult.Error): UiText = when (error.code) {
+        GitHubAuthManager.ERROR_EXPIRED -> UiText(R.string.msg_code_expired)
+        GitHubAuthManager.ERROR_DENIED -> UiText(R.string.msg_auth_denied)
+        GitHubAuthManager.ERROR_UNEXPECTED ->
+            UiText(R.string.msg_unexpected_response, listOf(error.detail.orEmpty()))
+        else -> UiText(R.string.msg_raw, listOf(error.detail ?: error.code))
+    }
+
+    private fun friendlyError(e: Throwable): UiText = when (e) {
+        is java.net.UnknownHostException -> UiText(R.string.msg_no_connection)
+        is java.net.SocketTimeoutException -> UiText(R.string.msg_timeout)
+        is GitHubAuthManager.InvalidTokenException ->
+            UiText(R.string.msg_invalid_token, listOf(e.httpCode))
+        else -> e.message?.let { UiText(R.string.msg_raw, listOf(it)) }
+            ?: UiText(R.string.msg_network_error)
     }
 
     fun loginWithPat(rawToken: String) {
         val token = rawToken.trim()
         if (token.isEmpty()) {
-            _auth.update { it.copy(message = "Pega un token valido.") }
+            _auth.update { it.copy(message = UiText(R.string.msg_paste_token)) }
             return
         }
         _auth.update { it.copy(busy = true, message = null) }
@@ -237,7 +251,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
                 method = method,
                 busy = false,
                 deviceCode = null,
-                message = "Sesion iniciada como @$login"
+                message = UiText(R.string.msg_signed_in, listOf(login))
             )
         }
     }
@@ -251,18 +265,21 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         pollJob?.cancel()
         tokenStore.clear()
         _auth.update {
-            it.copy(loggedIn = false, login = null, method = null, deviceCode = null, message = "Sesion cerrada")
+            it.copy(
+                loggedIn = false, login = null, method = null, deviceCode = null,
+                message = UiText(R.string.msg_signed_out)
+            )
         }
     }
 
     fun contribute() {
         if (!tokenStore.isLoggedIn) {
-            _auth.update { it.copy(message = "Inicia sesion con GitHub primero.") }
+            _auth.update { it.copy(message = UiText(R.string.msg_sign_in_first)) }
             return
         }
         val locals = spamNumbers.value.filter { it.source == "local" }
         if (locals.isEmpty()) {
-            _auth.update { it.copy(message = "No tienes numeros propios reportados para aportar.") }
+            _auth.update { it.copy(message = UiText(R.string.msg_nothing_to_contribute)) }
             return
         }
         _auth.update { it.copy(busy = true, message = null) }
@@ -275,9 +292,12 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
                         repo = settings.contribRepo,
                         numbers = locals
                     )
-                    "Aporte enviado (Issue): $url"
+                    UiText(R.string.msg_contribution_sent, listOf(url))
                 } catch (e: Exception) {
-                    "Error al aportar: ${e.message ?: "desconocido"}"
+                    UiText(
+                        R.string.msg_contribution_error,
+                        listOf(e.message ?: UiText(R.string.msg_unknown_error))
+                    )
                 }
             }
             _auth.update { it.copy(busy = false, message = message) }

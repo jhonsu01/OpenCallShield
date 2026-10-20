@@ -22,8 +22,12 @@ class GitHubAuthManager {
         data class Success(val token: String) : PollResult()
         data object Pending : PollResult()
         data class SlowDown(val interval: Int) : PollResult()
-        data class Error(val message: String) : PollResult()
+        /** [code] es una de las constantes ERROR_*; la UI la traduce al idioma activo. */
+        data class Error(val code: String, val detail: String? = null) : PollResult()
     }
+
+    /** El token no es valido o no tiene permisos; la UI muestra el mensaje traducido. */
+    class InvalidTokenException(val httpCode: Int) : Exception("Invalid token ($httpCode)")
 
     /** Paso 1 del Device Flow: solicita el codigo de dispositivo. */
     fun startDeviceFlow(clientId: String, scope: String = SCOPE): DeviceCode {
@@ -72,10 +76,12 @@ class GitHubAuthManager {
         return when (j.optString("error")) {
             "authorization_pending" -> PollResult.Pending
             "slow_down" -> PollResult.SlowDown(j.optInt("interval", 5))
-            "expired_token" -> PollResult.Error("El codigo expiro, vuelve a empezar.")
-            "access_denied" -> PollResult.Error("Autorizacion cancelada.")
-            "" -> PollResult.Error("Respuesta inesperada (${res.code}).")
-            else -> PollResult.Error(j.optString("error_description", j.getString("error")))
+            "expired_token" -> PollResult.Error(ERROR_EXPIRED)
+            "access_denied" -> PollResult.Error(ERROR_DENIED)
+            "" -> PollResult.Error(ERROR_UNEXPECTED, res.code.toString())
+            else -> PollResult.Error(
+                ERROR_OTHER, j.optString("error_description", j.getString("error"))
+            )
         }
     }
 
@@ -89,11 +95,15 @@ class GitHubAuthManager {
                 "Authorization" to "Bearer $token"
             )
         )
-        if (!res.isSuccess) throw IllegalStateException("Token invalido o sin permisos (${res.code}).")
+        if (!res.isSuccess) throw InvalidTokenException(res.code)
         return res.json().getString("login")
     }
 
     companion object {
         const val SCOPE = "public_repo"
+        const val ERROR_EXPIRED = "expired"
+        const val ERROR_DENIED = "denied"
+        const val ERROR_UNEXPECTED = "unexpected"
+        const val ERROR_OTHER = "other"
     }
 }

@@ -12,6 +12,7 @@
     <application
         android:name=".OpenCallShieldApp"
         android:allowBackup="true"
+        android:localeConfig="@xml/locales_config"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
@@ -36,6 +37,16 @@
             <intent-filter>
                 <action android:name="android.telecom.CallScreeningService" />
             </intent-filter>
+        </service>
+
+        <!-- Persiste el idioma elegido en la app en Android 12 o anterior (AppCompat). -->
+        <service
+            android:name="androidx.appcompat.app.AppLocalesMetadataHolderService"
+            android:enabled="false"
+            android:exported="false">
+            <meta-data
+                android:name="autoStoreLocales"
+                android:value="true" />
         </service>
 
     </application>

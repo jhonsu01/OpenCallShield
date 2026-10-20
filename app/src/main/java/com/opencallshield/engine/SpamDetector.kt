@@ -20,7 +20,16 @@ class SpamDetector(
 
     sealed class Decision {
         data object Allow : Decision()
+        /** [reason] es un codigo (REASON_*), no una frase: la UI lo traduce al mostrarlo. */
         data class Block(val reason: String, val silence: Boolean) : Decision()
+    }
+
+    companion object {
+        const val REASON_SPAM = "spam"
+        const val REASON_HIDDEN = "hidden"
+        const val REASON_UNKNOWN = "unknown"
+        /** Se guarda como "prefix:+234". */
+        const val REASON_PREFIX = "prefix:"
     }
 
     suspend fun evaluate(rawNumber: String?): Decision {
@@ -35,23 +44,23 @@ class SpamDetector(
 
         // 2. Reportado como SPAM (local o colaborativo)
         if (number.isNotEmpty() && repo.isSpam(number)) {
-            return Decision.Block("Reportado como SPAM", silence)
+            return Decision.Block(REASON_SPAM, silence)
         }
 
         // 3. Prefijo en lista negra
         if (settings.blockPrefixes && number.isNotEmpty()) {
             val match = settings.prefixes().firstOrNull { number.startsWith(it) }
             if (match != null) {
-                return Decision.Block("Prefijo sospechoso ($match)", silence)
+                return Decision.Block(REASON_PREFIX + match, silence)
             }
         }
 
         // 4. Numero desconocido u oculto
         if (settings.blockUnknown) {
             return if (number.isEmpty()) {
-                Decision.Block("Numero oculto", silence)
+                Decision.Block(REASON_HIDDEN, silence)
             } else {
-                Decision.Block("Numero fuera de contactos", silence)
+                Decision.Block(REASON_UNKNOWN, silence)
             }
         }
 

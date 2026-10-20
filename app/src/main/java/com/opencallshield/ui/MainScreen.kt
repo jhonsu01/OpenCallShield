@@ -1,5 +1,7 @@
 package com.opencallshield.ui
 
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -28,22 +30,25 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material.icons.filled.Sync
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.SnackbarHost
@@ -63,22 +68,43 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.opencallshield.R
 import com.opencallshield.data.BlockedCall
 import com.opencallshield.data.Countries
 import com.opencallshield.data.SpamNumber
 import com.opencallshield.data.SpamRepository
-import java.text.SimpleDateFormat
+import com.opencallshield.engine.SpamDetector
+import java.text.DateFormat
 import java.util.Date
-import java.util.Locale
 
 private const val REPO_URL = "https://github.com/jhonsu01/OpenCallShield"
 private const val KOFI_URL = "https://ko-fi.com/V7V81LV7GX"
 private const val GUIDE_URL =
     "https://github.com/jhonsu01/OpenCallShield/blob/main/docs/CREAR_BASE_COLABORATIVA.md"
+
+/**
+ * Idiomas de la interfaz: etiqueta BCP 47 + nombre en su propio idioma (endonimo), que
+ * es como cada usuario reconoce el suyo aunque la app este en otro idioma.
+ */
+private val LANGUAGES = listOf(
+    "en" to "English",
+    "es" to "Español",
+    "pt" to "Português",
+    "fr" to "Français",
+    "de" to "Deutsch",
+    "ru" to "Русский",
+    "zh-CN" to "中文 (简体)",
+    "ja" to "日本語",
+    "ko" to "한국어"
+)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -86,28 +112,38 @@ fun MainScreen(
     viewModel: MainViewModel,
     onRequestRole: () -> Unit
 ) {
-    val tabs = listOf("Proteccion", "Lista SPAM", "Historial")
+    val tabs = listOf(
+        stringResource(R.string.tab_protection),
+        stringResource(R.string.tab_spam_list),
+        stringResource(R.string.tab_history)
+    )
     var selectedTab by remember { mutableIntStateOf(0) }
     var showAccount by remember { mutableStateOf(false) }
+    var showLanguage by remember { mutableStateOf(false) }
 
     val state by viewModel.state.collectAsStateWithLifecycle()
     val authState by viewModel.authState.collectAsStateWithLifecycle()
     val spamNumbers by viewModel.spamNumbers.collectAsStateWithLifecycle()
     val blockedCalls by viewModel.blockedCalls.collectAsStateWithLifecycle()
 
+    val context = LocalContext.current
     val snackbarHost = remember { SnackbarHostState() }
 
     LaunchedEffect(state.message) {
         state.message?.let {
-            snackbarHost.showSnackbar(it)
+            snackbarHost.showSnackbar(it.resolve(context))
             viewModel.consumeMessage()
         }
     }
     LaunchedEffect(authState.message) {
         authState.message?.let {
-            snackbarHost.showSnackbar(it)
+            snackbarHost.showSnackbar(it.resolve(context))
             viewModel.consumeAuthMessage()
         }
+    }
+
+    if (showLanguage) {
+        LanguageDialog(onDismiss = { showLanguage = false })
     }
 
     Scaffold(
@@ -118,14 +154,25 @@ fun MainScreen(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Filled.Shield, contentDescription = null)
                         Spacer(Modifier.width(8.dp))
-                        Text(if (showAccount) "Colaborar" else "OpenCallShield")
+                        Text(
+                            if (showAccount) stringResource(R.string.title_collaborate)
+                            else stringResource(R.string.app_name)
+                        )
                     }
                 },
                 actions = {
+                    IconButton(onClick = { showLanguage = true }) {
+                        Icon(
+                            Icons.Filled.Language,
+                            contentDescription = stringResource(R.string.cd_language)
+                        )
+                    }
                     IconButton(onClick = { showAccount = !showAccount }) {
                         Icon(
                             if (showAccount) Icons.Filled.Close else Icons.Filled.MoreVert,
-                            contentDescription = if (showAccount) "Cerrar" else "Mas opciones"
+                            contentDescription = stringResource(
+                                if (showAccount) R.string.cd_close else R.string.cd_more_options
+                            )
                         )
                     }
                 }
@@ -155,6 +202,53 @@ fun MainScreen(
     }
 }
 
+/**
+ * Selector de idioma de la app. AppCompat guarda la eleccion y recrea la Activity;
+ * en Android 13+ queda ademas sincronizado con Ajustes > Apps > Idioma.
+ */
+@Composable
+private fun LanguageDialog(onDismiss: () -> Unit) {
+    val current = AppCompatDelegate.getApplicationLocales().toLanguageTags()
+    // "zh-Hans-CN" o "es-419" deben marcar su opcion: se compara por idioma base.
+    fun isSelected(tag: String) = when {
+        current.isEmpty() -> tag.isEmpty()
+        tag.isEmpty() -> false
+        else -> current.substringBefore(',').substringBefore('-') == tag.substringBefore('-')
+    }
+    fun choose(tag: String) {
+        AppCompatDelegate.setApplicationLocales(
+            if (tag.isEmpty()) LocaleListCompat.getEmptyLocaleList()
+            else LocaleListCompat.forLanguageTags(tag)
+        )
+        onDismiss()
+    }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.language_title)) },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState())) {
+                (listOf("" to stringResource(R.string.language_system)) + LANGUAGES).forEach { (tag, name) ->
+                    Row(
+                        Modifier
+                            .fillMaxWidth()
+                            .clickable { choose(tag) }
+                            .padding(vertical = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        RadioButton(selected = isSelected(tag), onClick = { choose(tag) })
+                        Spacer(Modifier.width(8.dp))
+                        Text(name, style = MaterialTheme.typography.bodyLarge)
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) }
+        }
+    )
+}
+
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun ProtectionTab(
@@ -165,6 +259,7 @@ private fun ProtectionTab(
     blockedCount: Int
 ) {
     val uriHandler = LocalUriHandler.current
+    val locale = LocalConfiguration.current.locales[0]
     var advancedOpen by remember { mutableStateOf(false) }
     var countriesOpen by remember { mutableStateOf(false) }
     Column(
@@ -177,13 +272,13 @@ private fun ProtectionTab(
         Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary)) {
             Column(Modifier.padding(16.dp)) {
                 Text(
-                    "Proteccion activa",
+                    stringResource(R.string.protection_active),
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onPrimary
                 )
                 Spacer(Modifier.size(4.dp))
                 Text(
-                    "$spamCount numeros en lista negra  -  $blockedCount llamadas filtradas",
+                    stringResource(R.string.protection_stats, spamCount, blockedCount),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onPrimary
                 )
@@ -193,31 +288,30 @@ private fun ProtectionTab(
         Button(onClick = onRequestRole, modifier = Modifier.fillMaxWidth()) {
             Icon(Icons.Filled.Shield, contentDescription = null)
             Spacer(Modifier.width(8.dp))
-            Text("Activar como app de filtrado de llamadas")
+            Text(stringResource(R.string.activate_screening))
         }
         Text(
-            "Android pedira permiso para que OpenCallShield filtre tus llamadas. " +
-                "Es necesario para bloquear el SPAM.",
+            stringResource(R.string.activate_screening_hint),
             style = MaterialTheme.typography.bodySmall
         )
 
         HorizontalDivider()
 
         SettingRow(
-            title = "Bloquear numeros desconocidos",
-            subtitle = "Rechaza llamadas que no esten en tus contactos",
+            title = stringResource(R.string.block_unknown_title),
+            subtitle = stringResource(R.string.block_unknown_sub),
             checked = state.blockUnknown,
             onCheckedChange = viewModel::setBlockUnknown
         )
         SettingRow(
-            title = "Bloquear prefijos sospechosos",
-            subtitle = "Usa la lista negra de prefijos internacionales",
+            title = stringResource(R.string.block_prefixes_title),
+            subtitle = stringResource(R.string.block_prefixes_sub),
             checked = state.blockPrefixes,
             onCheckedChange = viewModel::setBlockPrefixes
         )
         SettingRow(
-            title = "Silenciar en vez de rechazar",
-            subtitle = "La llamada no suena pero queda como perdida",
+            title = stringResource(R.string.silence_title),
+            subtitle = stringResource(R.string.silence_sub),
             checked = state.silence,
             onCheckedChange = viewModel::setSilence
         )
@@ -237,16 +331,16 @@ private fun ProtectionTab(
             )
             Spacer(Modifier.width(8.dp))
             Text(
-                if (countriesCount > 0) "Bloquear llamadas por pais  ($countriesCount)"
-                else "Bloquear llamadas por pais"
+                if (countriesCount > 0) stringResource(R.string.block_by_country_count, countriesCount)
+                else stringResource(R.string.block_by_country)
             )
         }
         if (countriesOpen) {
             Text(
-                "Toca las banderas de los paises cuyas llamadas NO quieres recibir. " +
-                    "No necesitas escribir prefijos.",
+                stringResource(R.string.countries_hint),
                 style = MaterialTheme.typography.bodySmall
             )
+            val premium = stringResource(R.string.country_premium)
             FlowRow(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(6.dp)
@@ -255,7 +349,7 @@ private fun ProtectionTab(
                     FilterChip(
                         selected = c.dialCode in activePrefixes,
                         onClick = { viewModel.toggleCountryPrefix(c.dialCode) },
-                        label = { Text("${c.flag} ${c.name}") }
+                        label = { Text("${c.flag} ${c.displayName(locale) ?: premium}") }
                     )
                 }
             }
@@ -271,9 +365,9 @@ private fun ProtectionTab(
             if (state.syncing) {
                 CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp)
                 Spacer(Modifier.width(8.dp))
-                Text("Sincronizando...")
+                Text(stringResource(R.string.syncing))
             } else {
-                Text("Sincronizar ahora")
+                Text(stringResource(R.string.sync_now))
             }
         }
 
@@ -287,20 +381,20 @@ private fun ProtectionTab(
                 contentDescription = null
             )
             Spacer(Modifier.width(8.dp))
-            Text("Ajustes avanzados")
+            Text(stringResource(R.string.advanced_settings))
         }
         if (advancedOpen) {
             OutlinedTextField(
                 value = state.syncUrl,
                 onValueChange = viewModel::setSyncUrl,
-                label = { Text("URL de la base colaborativa (JSON)") },
+                label = { Text(stringResource(R.string.sync_url_label)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true
             )
             OutlinedTextField(
                 value = state.prefixes,
                 onValueChange = viewModel::setPrefixes,
-                label = { Text("Prefijos manuales (avanzado, separados por coma)") },
+                label = { Text(stringResource(R.string.manual_prefixes_label)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true
             )
@@ -308,7 +402,7 @@ private fun ProtectionTab(
                 onClick = { uriHandler.openUri(GUIDE_URL) },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("¿Como crear tu propia base colaborativa? (guia)")
+                Text(stringResource(R.string.guide_link))
             }
         }
 
@@ -320,10 +414,10 @@ private fun ProtectionTab(
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF29ABE0))
         ) {
-            Text("☕  Apoyame en Ko-fi")
+            Text(stringResource(R.string.kofi_button))
         }
         Text(
-            "OpenCallShield es gratuito y open source. Si te resulta util, considera apoyarlo.",
+            stringResource(R.string.kofi_hint),
             style = MaterialTheme.typography.bodySmall
         )
 
@@ -332,7 +426,7 @@ private fun ProtectionTab(
             onClick = { uriHandler.openUri(REPO_URL) },
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("OpenCallShield  -  ver el proyecto en GitHub")
+            Text(stringResource(R.string.repo_link))
         }
     }
 }
@@ -372,7 +466,7 @@ private fun SpamListTab(
             OutlinedTextField(
                 value = input,
                 onValueChange = { input = it },
-                label = { Text("Numero a reportar") },
+                label = { Text(stringResource(R.string.number_to_report)) },
                 modifier = Modifier.weight(1f),
                 singleLine = true
             )
@@ -381,7 +475,7 @@ private fun SpamListTab(
                 viewModel.report(input)
                 input = ""
             }) {
-                Icon(Icons.Filled.Block, contentDescription = "Reportar")
+                Icon(Icons.Filled.Block, contentDescription = stringResource(R.string.cd_report))
             }
         }
 
@@ -394,8 +488,8 @@ private fun SpamListTab(
             Icon(Icons.Filled.CloudUpload, contentDescription = null)
             Spacer(Modifier.width(8.dp))
             Text(
-                if (authState.loggedIn) "Aportar $localCount numero(s) a la base publica"
-                else "Aportar a la base publica (opcional)"
+                if (authState.loggedIn) stringResource(R.string.contribute_n, localCount)
+                else stringResource(R.string.contribute_optional)
             )
         }
 
@@ -408,23 +502,24 @@ private fun SpamListTab(
             if (syncing) {
                 CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp)
                 Spacer(Modifier.width(8.dp))
-                Text("Sincronizando...")
+                Text(stringResource(R.string.syncing))
             } else {
                 Icon(Icons.Filled.Sync, contentDescription = null)
                 Spacer(Modifier.width(8.dp))
-                Text("Sincronizar base publica")
+                Text(stringResource(R.string.sync_public_db))
             }
         }
         Text(
-            "Sincroniza primero la base publica: los numeros que ya esten en ella no se " +
-                "vuelven a reportar. Asi solo aportas numeros nuevos y evitas duplicados.",
+            stringResource(R.string.sync_first_hint),
             style = MaterialTheme.typography.bodySmall
         )
 
         Spacer(Modifier.size(12.dp))
         if (numbers.isEmpty()) {
-            EmptyState("Aun no hay numeros reportados.")
+            EmptyState(stringResource(R.string.empty_spam_list))
         } else {
+            val sourceLocal = stringResource(R.string.source_local)
+            val sourceGithub = stringResource(R.string.source_github)
             LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 items(numbers, key = { it.number }) { item ->
                     Card(Modifier.fillMaxWidth()) {
@@ -435,12 +530,17 @@ private fun SpamListTab(
                             Column(Modifier.weight(1f)) {
                                 Text(item.number, style = MaterialTheme.typography.bodyLarge)
                                 Text(
-                                    "${item.tag} - ${item.reports} reportes - ${item.source}",
+                                    stringResource(
+                                        R.string.spam_item_meta,
+                                        item.tag,
+                                        item.reports,
+                                        if (item.source == "local") sourceLocal else sourceGithub
+                                    ),
                                     style = MaterialTheme.typography.bodySmall
                                 )
                             }
                             IconButton(onClick = { viewModel.remove(item) }) {
-                                Icon(Icons.Filled.Delete, contentDescription = "Eliminar")
+                                Icon(Icons.Filled.Delete, contentDescription = stringResource(R.string.cd_delete))
                             }
                         }
                     }
@@ -450,13 +550,41 @@ private fun SpamListTab(
     }
 }
 
+/** Numero oculto: vacio desde v1.5.0, "(oculto)" en registros de versiones anteriores. */
+private fun isHiddenNumber(number: String) = number.isBlank() || number == "(oculto)"
+
+/**
+ * Traduce el motivo guardado. Desde v1.5.0 es un codigo (SpamDetector.REASON_*); los
+ * registros anteriores guardaban la frase en espanol, que tambien se reconoce aqui.
+ */
+@Composable
+private fun reasonText(reason: String): String {
+    val legacyPrefix = Regex("""Prefijo sospechoso \((.*)\)""").matchEntire(reason)
+    return when {
+        reason == SpamDetector.REASON_SPAM || reason == "Reportado como SPAM" ->
+            stringResource(R.string.reason_spam)
+        reason.startsWith(SpamDetector.REASON_PREFIX) ->
+            stringResource(R.string.reason_prefix, reason.removePrefix(SpamDetector.REASON_PREFIX))
+        legacyPrefix != null ->
+            stringResource(R.string.reason_prefix, legacyPrefix.groupValues[1])
+        reason == SpamDetector.REASON_HIDDEN || reason == "Numero oculto" ->
+            stringResource(R.string.reason_hidden)
+        reason == SpamDetector.REASON_UNKNOWN || reason == "Numero fuera de contactos" ->
+            stringResource(R.string.reason_unknown)
+        else -> reason
+    }
+}
+
 @Composable
 private fun HistoryTab(
     calls: List<BlockedCall>,
     spamNumbers: List<SpamNumber>,
     viewModel: MainViewModel
 ) {
-    val formatter = remember { SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()) }
+    val locale = LocalConfiguration.current.locales[0]
+    val formatter = remember(locale) {
+        DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, locale)
+    }
     val spamSet = remember(spamNumbers) { spamNumbers.map { it.number }.toHashSet() }
 
     Column(Modifier.fillMaxSize().padding(16.dp)) {
@@ -465,27 +593,31 @@ private fun HistoryTab(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("Llamadas filtradas", style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.filtered_calls), style = MaterialTheme.typography.titleMedium)
             if (calls.isNotEmpty()) {
                 OutlinedButton(onClick = { viewModel.clearHistory() }) {
                     Icon(Icons.Filled.History, contentDescription = null)
                     Spacer(Modifier.width(4.dp))
-                    Text("Limpiar")
+                    Text(stringResource(R.string.clear))
                 }
             }
         }
         Text(
-            "Toca + para anadir el numero a la lista de SPAM, o el check para quitarlo.",
+            stringResource(R.string.history_hint),
             style = MaterialTheme.typography.bodySmall
         )
         Spacer(Modifier.size(12.dp))
         if (calls.isEmpty()) {
-            EmptyState("Todavia no se ha filtrado ninguna llamada.")
+            EmptyState(stringResource(R.string.empty_history))
         } else {
             LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 items(calls, key = { it.id }) { call ->
+                    val hidden = isHiddenNumber(call.number)
                     val normalized = SpamRepository.normalize(call.number)
                     val inList = normalized in spamSet
+                    val action = stringResource(
+                        if (call.silenced) R.string.call_silenced else R.string.call_rejected
+                    )
                     Card(Modifier.fillMaxWidth()) {
                         Row(
                             Modifier.padding(12.dp),
@@ -493,13 +625,13 @@ private fun HistoryTab(
                         ) {
                             Column(Modifier.weight(1f)) {
                                 Text(
-                                    call.number,
+                                    if (hidden) stringResource(R.string.hidden_number) else call.number,
                                     style = MaterialTheme.typography.bodyLarge,
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis
                                 )
                                 Text(
-                                    "${if (call.silenced) "Silenciada" else "Rechazada"} - ${call.reason}",
+                                    "$action · ${reasonText(call.reason)}",
                                     style = MaterialTheme.typography.bodySmall
                                 )
                                 Text(
@@ -507,20 +639,23 @@ private fun HistoryTab(
                                     style = MaterialTheme.typography.bodySmall
                                 )
                             }
-                            if (inList) {
-                                IconButton(onClick = { viewModel.removeNumber(call.number) }) {
-                                    Icon(
-                                        Icons.Filled.CheckCircle,
-                                        contentDescription = "Quitar de SPAM",
-                                        tint = MaterialTheme.colorScheme.primary
-                                    )
-                                }
-                            } else {
-                                IconButton(onClick = { viewModel.addToSpam(call.number) }) {
-                                    Icon(
-                                        Icons.Filled.AddCircle,
-                                        contentDescription = "Anadir a SPAM"
-                                    )
+                            // Un numero oculto no se puede anadir a la lista de SPAM.
+                            if (!hidden) {
+                                if (inList) {
+                                    IconButton(onClick = { viewModel.removeNumber(call.number) }) {
+                                        Icon(
+                                            Icons.Filled.CheckCircle,
+                                            contentDescription = stringResource(R.string.cd_remove_from_spam),
+                                            tint = MaterialTheme.colorScheme.primary
+                                        )
+                                    }
+                                } else {
+                                    IconButton(onClick = { viewModel.addToSpam(call.number) }) {
+                                        Icon(
+                                            Icons.Filled.AddCircle,
+                                            contentDescription = stringResource(R.string.cd_add_to_spam)
+                                        )
+                                    }
                                 }
                             }
                         }
@@ -546,16 +681,24 @@ private fun AccountTab(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         if (authState.loggedIn) {
+            val method = when (authState.method) {
+                "device" -> stringResource(R.string.method_device)
+                "pat" -> stringResource(R.string.method_pat)
+                else -> authState.method ?: "-"
+            }
             Card(Modifier.fillMaxWidth()) {
                 Column(Modifier.padding(16.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Filled.AccountCircle, contentDescription = null)
                         Spacer(Modifier.width(8.dp))
-                        Text("Conectado como @${authState.login}", style = MaterialTheme.typography.titleMedium)
+                        Text(
+                            stringResource(R.string.connected_as, authState.login.orEmpty()),
+                            style = MaterialTheme.typography.titleMedium
+                        )
                     }
                     Spacer(Modifier.size(4.dp))
                     Text(
-                        "Metodo: ${authState.method ?: "-"}. Tus aportes se envian como Issue al repositorio publico.",
+                        stringResource(R.string.connected_method, method),
                         style = MaterialTheme.typography.bodySmall
                     )
                 }
@@ -563,7 +706,7 @@ private fun AccountTab(
             OutlinedButton(onClick = { viewModel.logout() }, modifier = Modifier.fillMaxWidth()) {
                 Icon(Icons.AutoMirrored.Filled.Logout, contentDescription = null)
                 Spacer(Modifier.width(8.dp))
-                Text("Cerrar sesion")
+                Text(stringResource(R.string.logout))
             }
             return@Column
         }
@@ -573,7 +716,7 @@ private fun AccountTab(
         if (device != null) {
             Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)) {
                 Column(Modifier.padding(16.dp)) {
-                    Text("Paso 1 - Escribe este codigo en GitHub:", style = MaterialTheme.typography.bodyMedium)
+                    Text(stringResource(R.string.device_step1), style = MaterialTheme.typography.bodyMedium)
                     Spacer(Modifier.size(8.dp))
                     Text(
                         device.userCode,
@@ -587,38 +730,37 @@ private fun AccountTab(
                     ) {
                         Icon(Icons.AutoMirrored.Filled.OpenInNew, contentDescription = null)
                         Spacer(Modifier.width(8.dp))
-                        Text("Abrir ${device.verificationUri}")
+                        Text(stringResource(R.string.open_url, device.verificationUri))
                     }
                     Spacer(Modifier.size(12.dp))
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp)
                         Spacer(Modifier.width(8.dp))
-                        Text("Esperando autorizacion...", style = MaterialTheme.typography.bodySmall)
+                        Text(stringResource(R.string.waiting_auth), style = MaterialTheme.typography.bodySmall)
                     }
                     Spacer(Modifier.size(8.dp))
                     OutlinedButton(
                         onClick = { viewModel.cancelDeviceLogin() },
                         modifier = Modifier.fillMaxWidth()
-                    ) { Text("Cancelar") }
+                    ) { Text(stringResource(R.string.cancel)) }
                 }
             }
             return@Column
         }
 
         Text(
-            "Colaborar es OPCIONAL. La app funciona completa sin esto. Conecta una " +
-                "cuenta solo si quieres aportar numeros a la base publica colaborativa.",
+            stringResource(R.string.collaborate_intro),
             style = MaterialTheme.typography.bodyMedium
         )
 
         // --- Device Flow ---
         Card(Modifier.fillMaxWidth()) {
             Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text("Opcion A - Codigo de dispositivo", style = MaterialTheme.typography.titleSmall)
+                Text(stringResource(R.string.option_a), style = MaterialTheme.typography.titleSmall)
                 OutlinedTextField(
                     value = authState.clientId,
                     onValueChange = viewModel::setClientId,
-                    label = { Text("Client ID (publico)") },
+                    label = { Text(stringResource(R.string.client_id_label)) },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true
                 )
@@ -627,10 +769,10 @@ private fun AccountTab(
                     modifier = Modifier.fillMaxWidth(),
                     enabled = !authState.busy
                 ) {
-                    Text("Conectar")
+                    Text(stringResource(R.string.connect))
                 }
                 Text(
-                    "Se abrira github.com/login/device para autorizar. El Client ID es publico.",
+                    stringResource(R.string.device_hint),
                     style = MaterialTheme.typography.bodySmall
                 )
             }
@@ -642,11 +784,11 @@ private fun AccountTab(
         var pat by remember { mutableStateOf("") }
         Card(Modifier.fillMaxWidth()) {
             Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text("Opcion B - Token personal (PAT)", style = MaterialTheme.typography.titleSmall)
+                Text(stringResource(R.string.option_b), style = MaterialTheme.typography.titleSmall)
                 OutlinedTextField(
                     value = pat,
                     onValueChange = { pat = it },
-                    label = { Text("Token (scope public_repo)") },
+                    label = { Text(stringResource(R.string.token_label)) },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true
                 )
@@ -655,10 +797,10 @@ private fun AccountTab(
                     modifier = Modifier.fillMaxWidth(),
                     enabled = !authState.busy
                 ) {
-                    Text("Conectar con token")
+                    Text(stringResource(R.string.connect_with_token))
                 }
                 Text(
-                    "Crea el token en github.com/settings/tokens con permiso public_repo.",
+                    stringResource(R.string.token_hint),
                     style = MaterialTheme.typography.bodySmall
                 )
             }
@@ -668,7 +810,7 @@ private fun AccountTab(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp)
                 Spacer(Modifier.width(8.dp))
-                Text("Procesando...", style = MaterialTheme.typography.bodySmall)
+                Text(stringResource(R.string.processing), style = MaterialTheme.typography.bodySmall)
             }
         }
     }

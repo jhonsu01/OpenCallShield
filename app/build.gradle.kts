@@ -27,8 +27,8 @@ android {
         minSdk = 29
         targetSdk = 36
         // En CI se derivan del tag (vX.Y.Z); en local usan estos valores por defecto.
-        versionCode = (project.findProperty("versionCodeOverride") as String?)?.toInt() ?: 10403
-        versionName = (project.findProperty("versionNameOverride") as String?) ?: "1.4.3"
+        versionCode = (project.findProperty("versionCodeOverride") as String?)?.toInt() ?: 10500
+        versionName = (project.findProperty("versionNameOverride") as String?) ?: "1.5.0"
         vectorDrawables { useSupportLibrary = true }
     }
 
@@ -91,6 +91,8 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.4")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.4")
     implementation("androidx.activity:activity-compose:1.9.1")
+    // Idioma por app (AppCompatDelegate.setApplicationLocales) con soporte hasta Android 10.
+    implementation("androidx.appcompat:appcompat:1.7.0")
 
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")

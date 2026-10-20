@@ -5,8 +5,9 @@ import android.app.role.RoleManager
 import android.content.Context
 import android.os.Build
 import android.os.Bundle
-import androidx.activity.ComponentActivity
+import androidx.appcompat.app.AppCompatActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,7 +25,9 @@ import com.opencallshield.ui.MainScreen
 import com.opencallshield.ui.MainViewModel
 import com.opencallshield.ui.theme.OpenCallShieldTheme
 
-class MainActivity : ComponentActivity() {
+// AppCompatActivity (y no ComponentActivity) para que AppCompatDelegate.setApplicationLocales
+// recree la pantalla con el idioma elegido tambien en Android 10-12.
+class MainActivity : AppCompatActivity() {
 
     private val viewModel: MainViewModel by viewModels()
 
@@ -50,6 +53,9 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Con targetSdk 36 Android fuerza edge-to-edge: sin esto la barra de estado queda
+        // transparente con iconos blancos sobre fondo blanco (invisibles).
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         requestRuntimePermissions()
 
@@ -125,13 +131,10 @@ class MainActivity : ComponentActivity() {
 
     private fun showUpdateReadyPrompt() {
         android.app.AlertDialog.Builder(this)
-            .setTitle("Actualizacion disponible")
-            .setMessage(
-                "Se descargo una nueva version de OpenCallShield. " +
-                    "Reinicia la app para aplicarla y ver las novedades."
-            )
-            .setPositiveButton("Reiniciar ahora") { _, _ -> appUpdateManager.completeUpdate() }
-            .setNegativeButton("Mas tarde", null)
+            .setTitle(R.string.update_title)
+            .setMessage(R.string.update_message)
+            .setPositiveButton(R.string.update_restart) { _, _ -> appUpdateManager.completeUpdate() }
+            .setNegativeButton(R.string.update_later, null)
             .show()
     }
 

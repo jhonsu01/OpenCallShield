@@ -1,0 +1,5 @@
+• O app agora está disponível em 9 idiomas: inglês, espanhol, português, francês, alemão, russo, chinês, japonês e coreano.
+• Novo seletor de idioma (ícone do globo), também disponível nas configurações do Android.
+• Os nomes dos países aparecem no seu idioma.
+• Atualizado para o Android 16 (API 36).
+• Melhorias de estabilidade.
