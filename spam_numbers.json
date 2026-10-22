@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updated_at": "2026-10-20",
+  "updated_at": "2026-10-21",
   "numbers": [
     {
       "number": "+12025550143",
@@ -4299,6 +4299,46 @@
     },
     {
       "number": "3189838573",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3509981896",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3210326073",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3245612193",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "00573022655944",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3100546541",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3182378624",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3202006248",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03329681201",
       "reports": 1,
       "tag": "spam"
     }
