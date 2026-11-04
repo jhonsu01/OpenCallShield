@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updated_at": "2026-11-01",
+  "updated_at": "2026-11-03",
   "numbers": [
     {
       "number": "+12025550143",
@@ -4489,6 +4489,26 @@
     },
     {
       "number": "03432324517",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3170643341",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "+32757396124",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03266671353",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "30393041856",
       "reports": 1,
       "tag": "spam"
     }
