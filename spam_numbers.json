@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updated_at": "2026-11-06",
+  "updated_at": "2026-11-08",
   "numbers": [
     {
       "number": "+12025550143",
@@ -4589,6 +4589,116 @@
     },
     {
       "number": "39677879140",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3102460729",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3102615263",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3102572611",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3102272383",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3102641603",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3102271497",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3237996981",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3102284357",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3102503516",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3009231331",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3009231319",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "30141992424",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03573190037096",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3009139756",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3116768571",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3150318786",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3160636664",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "+1573173559005",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3153774723",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3120575430",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "03573297049294",
+      "reports": 1,
+      "tag": "spam"
+    },
+    {
+      "number": "3150094007",
       "reports": 1,
       "tag": "spam"
     }
